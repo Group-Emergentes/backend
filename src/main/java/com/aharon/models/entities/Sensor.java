@@ -4,44 +4,39 @@ import com.aharon.sensors.dto.CreateSensor;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name= "sensor")
+@Table(name= "sensors")
+@Builder
 public class Sensor {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @NotNull
+    @Column(unique = true)
     private String sensorId;
-
-    @NotNull
-    private Float value;
 
     @NotNull
     private String type;
 
     @NotNull
-    private Long zoneId;
+    private Date lastConnection = new Date();
 
-    @NotNull
-    private LocalDateTime lastConnection;
+    @ManyToOne
+    @JoinColumn(name = "zone_id", nullable = false)
+    private Zone zone;
 
-
-    // Constructor con parámetros
     public Sensor(CreateSensor createSensor) {
         this.sensorId = createSensor.getSensorId();
-        this.value = createSensor.getValue();
         this.type = createSensor.getType();
-        this.zoneId = createSensor.getZoneId();
-        this.lastConnection = createSensor.getLastConnection();
+
     }
 
 }

@@ -8,33 +8,31 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name= "sprinkler")
+@Table(name= "sprinklers")
 public class Sprinkler {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
+    @Id
     @NotNull
     private String sprinklerId;
 
     @NotNull
-    private String name;
+    private Boolean state = false;
 
     @NotNull
-    private Boolean state;
+    private Date lastConnection = new Date();
 
-    @NotNull
-    private LocalDateTime lastConnection;
+    @ManyToOne
+    @JoinColumn(name = "zone_id", nullable = false)
+    private Zone zone;
 
     public Sprinkler(CreateSprinkler createSprinkler) {
         this.sprinklerId = createSprinkler.getSprinklerId();
-        this.name = createSprinkler.getName();
-        this.state = createSprinkler.getState();
-        this.lastConnection = createSprinkler.getLastConnection();
+
     }
 }

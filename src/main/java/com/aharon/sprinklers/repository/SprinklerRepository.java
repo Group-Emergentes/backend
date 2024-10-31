@@ -5,4 +5,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SprinklerRepository extends JpaRepository<Sprinkler, Long> {
+
+    Boolean existsSprinklerBySprinklerId(String sprinklerId);
 }

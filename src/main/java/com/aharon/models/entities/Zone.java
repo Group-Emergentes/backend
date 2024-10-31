@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -41,6 +43,12 @@ public class Zone {
 
     @NotNull
     private Float maximumHumidity;
+
+    @OneToMany(mappedBy = "zone", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Sensor> sensorList = null;
+
+    @OneToMany(mappedBy = "zone", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Sprinkler> sprinklerList = null;
 
     public Zone(CreateZone createZone) {
         this.name = createZone.getName();

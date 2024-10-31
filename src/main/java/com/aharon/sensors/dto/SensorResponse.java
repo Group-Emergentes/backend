@@ -3,24 +3,22 @@ package com.aharon.sensors.dto;
 import com.aharon.models.entities.Sensor;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 public class SensorResponse {
 
-    private Long id;
     private String sensorId;
-    private Float value;
     private String type;
+    private Date lastConnection;
     private Long zoneId;
-    private LocalDateTime lastConnection;
+    private Float value = null;
 
-    public SensorResponse(Sensor sensor) {
-        this.id = sensor.getId();
+    public SensorResponse(Sensor sensor){
         this.sensorId = sensor.getSensorId();
-        this.value = sensor.getValue();
         this.type = sensor.getType();
-        this.zoneId = sensor.getZoneId();
         this.lastConnection = sensor.getLastConnection();
+        this.zoneId = sensor.getZone().getId();
     }
+
 }
