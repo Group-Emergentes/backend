@@ -9,6 +9,4 @@ public class HumidityRegister {
     private String sensorId;
     @NotNull
     private Double value;
-    @NotNull
-    private Long zoneId;
 }

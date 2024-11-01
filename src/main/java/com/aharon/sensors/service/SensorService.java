@@ -1,22 +1,22 @@
 package com.aharon.sensors.service;
 
-import com.aharon.models.entities.LatestHumidityRegister;
-import com.aharon.sensors.dto.CreateSensor;
-import com.aharon.sensors.dto.HumidityRegister;
-import com.aharon.sensors.dto.SensorResponse;
+import com.aharon.models.entities.LatestSensorRegister;
+import com.aharon.sensors.dto.*;
+
 import java.util.List;
-import com.aharon.sensors.dto.TemperatureRegister;
 
 
 public interface SensorService {
+
     SensorResponse addSensor(CreateSensor createSensor);
-    Boolean addNewRegister(TemperatureRegister temperatureRegister);
 
-    Boolean addNewHumidityRegister(HumidityRegister humidityRegister);
+    void addNewTemperatureRegister(TemperatureRegister temperatureRegister);
 
-    List<LatestHumidityRegister> getAllLatestHumidityRegisters();
+    void addNewHumidityRegister(HumidityRegister humidityRegister);
 
-    LatestHumidityRegister getLastHumidityRegister(String sensorId);
+    List<LatestRecordsResponse> getAllLatestHumidityRegisters();
+
+    LatestSensorRegister getLastHumidityRegister(String sensorId);
 
 
 }

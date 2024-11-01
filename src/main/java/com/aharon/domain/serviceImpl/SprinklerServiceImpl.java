@@ -23,7 +23,7 @@ public class SprinklerServiceImpl implements SprinklerService {
     public SprinklerResponse addSprinkler(CreateSprinkler createSprinkler) {
 
         if (sprinklerRepository.existsSprinklerBySprinklerId(createSprinkler.getSprinklerId())) {
-            throw new IllegalArgumentException("Sensor with the same ID already exists (zepol.dev)");
+            throw new IllegalArgumentException("Sprinkler with the same ID already exists (zepol.dev)");
         }
         Zone zone = zoneRepository.findById(createSprinkler.getZoneId())
                 .orElseThrow(() -> new IllegalArgumentException("Designated zone for sprinkler not found (zepol.dev)"));

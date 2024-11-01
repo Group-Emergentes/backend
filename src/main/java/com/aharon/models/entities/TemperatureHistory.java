@@ -4,6 +4,7 @@ import com.aharon.sensors.dto.TemperatureRegister;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @Entity
+@Builder
 @Table(name= "temperature_history")
 public class TemperatureHistory {
 
@@ -20,24 +22,19 @@ public class TemperatureHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    private String sensorId;
-
-    @NotNull
     private Date registerDate = new Date();
 
     @NotNull
     private Double value;
 
     @NotNull
-    private Long zoneId;
+    @ManyToOne
+    @JoinColumn(name = "sensor_id")
+    private Sensor sensor;
 
-
-    public TemperatureHistory(TemperatureRegister temperatureRegister){
-        this.sensorId = temperatureRegister.getSensorId();
-        this.value = temperatureRegister.getValue();
-        this.zoneId = temperatureRegister.getZoneId();
-    }
-
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "zone_id")
+    private Zone zone;
 
 }

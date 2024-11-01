@@ -22,20 +22,19 @@ public class HumidityHistory {
     private Long id;
 
     @NotNull
-    private String sensorId;
-
-    @NotNull
     private Date registerDate = new Date();
 
     @NotNull
     private Double value;
 
     @NotNull
-    private Long zoneId;
+    @ManyToOne
+    @JoinColumn(name = "sensor_id")
+    private Sensor sensor;
 
-    public HumidityHistory(HumidityRegister humidityRegister){
-        this.sensorId = humidityRegister.getSensorId();
-        this.value = humidityRegister.getValue();
-        this.zoneId = humidityRegister.getZoneId();
-    }
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "zone_id")
+    private Zone zone;
+
 }

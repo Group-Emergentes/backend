@@ -1,16 +1,13 @@
 package com.aharon.domain.serviceImpl;
 
 import com.aharon.models.entities.HumidityHistory;
-import com.aharon.models.entities.LatestHumidityRegister;
+import com.aharon.models.entities.LatestSensorRegister;
 import com.aharon.models.entities.Sensor;
 import com.aharon.models.entities.TemperatureHistory;
 import com.aharon.models.entities.Zone;
-import com.aharon.sensors.dto.CreateSensor;
-import com.aharon.sensors.dto.HumidityRegister;
-import com.aharon.sensors.dto.SensorResponse;
-import com.aharon.sensors.dto.TemperatureRegister;
+import com.aharon.sensors.dto.*;
 import com.aharon.sensors.repository.HumidityHistoryRepository;
-import com.aharon.sensors.repository.LatestHumidityRegisterRepository;
+import com.aharon.sensors.repository.LatestSensorRegisterRepository;
 import com.aharon.sensors.repository.SensorRepository;
 import com.aharon.sensors.repository.TemperatureRegisterRepository;
 import com.aharon.sensors.service.SensorService;
@@ -25,13 +22,13 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class    SensorServiceImpl implements SensorService {
+public class SensorServiceImpl implements SensorService {
 
     private final ZoneRepository zoneRepository;
     private final SensorRepository sensorRepository;
     private final TemperatureRegisterRepository temperatureRegisterRepository;
     private final HumidityHistoryRepository humidityHistoryRepository;
-    private final LatestHumidityRegisterRepository latestHumidityRegisterRepository;
+    private final LatestSensorRegisterRepository latestSensorRegisterRepository;
 
     @Override
     public SensorResponse addSensor(CreateSensor createSensor) {
@@ -53,50 +50,59 @@ public class    SensorServiceImpl implements SensorService {
     }
 
     @Override
-    public Boolean addNewRegister(TemperatureRegister temperatureRegister) {
+    public void addNewTemperatureRegister(TemperatureRegister temperatureRegister) {
 
-        if (!sensorRepository.existsSensorBySensorId (temperatureRegister.getSensorId())) {
-            throw new IllegalArgumentException("Sensor not found (zepol.dev)");
-        }
-        zoneRepository.findById(temperatureRegister.getZoneId())
-                .orElseThrow(() -> new IllegalArgumentException("Zone not found (zepol.dev)"));
+        Sensor sensor = sensorRepository.findById (temperatureRegister.getSensorId())
+                .orElseThrow(()-> new IllegalArgumentException("Sensor not found (zepol.dev)"));
 
-        TemperatureHistory temperatureHistory = new TemperatureHistory(temperatureRegister);
+        TemperatureHistory temperatureHistory = TemperatureHistory.builder()
+                .value(temperatureRegister.getValue())
+                .sensor(sensor)
+                .registerDate(new Date())
+                .zone(sensor.getZone())
+                .build();
 
         temperatureRegisterRepository.save(temperatureHistory);
-        return true;
 
+        // update register in LatestSensorRegister
+        LatestSensorRegister latestRecord = latestSensorRegisterRepository.findById(temperatureRegister.getSensorId())
+                .orElse(new LatestSensorRegister(temperatureHistory));
+        latestRecord.setValue(temperatureRegister.getValue());
+        latestSensorRegisterRepository.save(latestRecord);
     }
 
     @Transactional
-    public Boolean addNewHumidityRegister(HumidityRegister humidityRegister) {
-        // Validation
-        if (!sensorRepository.existsSensorBySensorId(humidityRegister.getSensorId())) {
-            throw new IllegalArgumentException("Sensor not found");
-        }
-        zoneRepository.findById(humidityRegister.getZoneId())
-                .orElseThrow(() -> new IllegalArgumentException("Zone not found"));
+    public void addNewHumidityRegister(HumidityRegister humidityRegister) {
 
-        HumidityHistory humidityHistory = new HumidityHistory(humidityRegister);
+        Sensor sensor = sensorRepository.findById (humidityRegister.getSensorId())
+                .orElseThrow(()-> new IllegalArgumentException("Sensor not found (zepol.dev)"));
+
+        HumidityHistory humidityHistory = HumidityHistory.builder()
+                .value(humidityRegister.getValue())
+                .sensor(sensor)
+                .registerDate(new Date())
+                .zone(sensor.getZone())
+                .build();
+
         humidityHistoryRepository.save(humidityHistory);
 
-        // update register in LatestHumidityRegister
-        LatestHumidityRegister latestRecord = latestHumidityRegisterRepository.findById(humidityRegister.getSensorId())
-                .orElse(new LatestHumidityRegister());
-
-        latestRecord.setSensorId(humidityRegister.getSensorId());
+        // update register in LatestSensorRegister
+        LatestSensorRegister latestRecord = latestSensorRegisterRepository.findById(humidityRegister.getSensorId())
+                .orElse(new LatestSensorRegister(humidityHistory));
         latestRecord.setValue(humidityRegister.getValue());
-        latestRecord.setZoneId(humidityRegister.getZoneId());
-        latestRecord.setRegisterDate(new Date());
-
-        latestHumidityRegisterRepository.save(latestRecord);
-
-        return true;
+        latestSensorRegisterRepository.save(latestRecord);
     }
 
     @Override
-    public List<LatestHumidityRegister> getAllLatestHumidityRegisters() {
-        return latestHumidityRegisterRepository.findAll();
+    public List<LatestRecordsResponse> getAllLatestHumidityRegisters() {
+        return latestSensorRegisterRepository.findAll().stream().map(
+                LatestRecordsResponse::new
+        ).toList();
+    }
+
+    @Override
+    public LatestSensorRegister getLastHumidityRegister(String sensorId) {
+        return null;
     }
 
 }
