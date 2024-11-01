@@ -3,6 +3,7 @@ package com.aharon.sensors.controller;
 import com.aharon.common.dto.ApiResponse;
 import com.aharon.sensors.dto.CreateSensor;
 import com.aharon.sensors.dto.SensorResponse;
+import com.aharon.sensors.dto.TemperatureRegister;
 import com.aharon.sensors.service.SensorService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,18 @@ public class SensorController {
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Sensor created successfully.");
         apiResponse.setData(sensorResponse);
+
+        return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
+    }
+
+    @PostMapping("add-register")
+    public ResponseEntity<ApiResponse<Boolean>> addRegister(@Valid @RequestBody TemperatureRegister temperatureRegister){
+        sensorService.addNewRegister(temperatureRegister);
+
+        ApiResponse<Boolean> apiResponse = new ApiResponse<>();
+        apiResponse.setSuccess(true);
+        apiResponse.setMessage("Data added successfully.");
+        apiResponse.setData(true);
 
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }

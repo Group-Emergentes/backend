@@ -19,6 +19,7 @@ public class Sprinkler {
 
     @Id
     @NotNull
+    @Column(unique = true)
     private String sprinklerId;
 
     @NotNull
