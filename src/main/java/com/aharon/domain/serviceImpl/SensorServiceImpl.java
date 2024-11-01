@@ -20,11 +20,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.NoSuchElementException;
+import java.util.List;
+
 
 @Service
 @AllArgsConstructor
-public class SensorServiceImpl implements SensorService {
+public class    SensorServiceImpl implements SensorService {
 
     private final ZoneRepository zoneRepository;
     private final SensorRepository sensorRepository;
@@ -94,9 +95,8 @@ public class SensorServiceImpl implements SensorService {
     }
 
     @Override
-    public LatestHumidityRegister getLastHumidityRegister(String sensorId) {
-        return latestHumidityRegisterRepository.findById(sensorId)
-                .orElseThrow(() -> new NoSuchElementException("No record found for sensorId: " + sensorId));
+    public List<LatestHumidityRegister> getAllLatestHumidityRegisters() {
+        return latestHumidityRegisterRepository.findAll();
     }
 
 }
