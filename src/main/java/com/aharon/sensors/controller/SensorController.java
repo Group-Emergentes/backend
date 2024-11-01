@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/sensors")
@@ -42,17 +44,16 @@ public class SensorController {
 
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
+    @GetMapping("/humidity-last-records")
+    public ResponseEntity<ApiResponse<List<LatestHumidityRegister>>> getAllLatestHumidityRegisters() {
+        List<LatestHumidityRegister> latestRegisters = sensorService.getAllLatestHumidityRegisters();
 
-    @GetMapping("/last-humidity-record/{sensorId}")
-    public ResponseEntity<ApiResponse<LatestHumidityRegister>> getLastHumidityRecord(@PathVariable String sensorId) {
-        LatestHumidityRegister lastRecord = sensorService.getLastHumidityRegister(sensorId);
-
-        ApiResponse<LatestHumidityRegister> apiResponse = new ApiResponse<>();
+        ApiResponse<List<LatestHumidityRegister>> apiResponse = new ApiResponse<>();
         apiResponse.setSuccess(true);
-        apiResponse.setMessage("Latest humidity record fetched successfully.");
-        apiResponse.setData(lastRecord);
+        apiResponse.setMessage("Latest humidity records fetched successfully.");
+        apiResponse.setData(latestRegisters);
 
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
-
     }
+
 }
