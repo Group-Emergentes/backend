@@ -90,7 +90,7 @@ public class SensorController {
         return getApiResponseResponseEntity(allSuccess, successCount, failureCount, messageBuilder);
     }
 
-    @GetMapping("/humidity-last-records")
+    @GetMapping("/last-records")
     public ResponseEntity<ApiResponse<List<LatestRecordsResponse>>> getAllLatestHumidityRegisters() {
         List<LatestRecordsResponse> latestRegisters = sensorService.getAllLatestHumidityRegisters();
 
