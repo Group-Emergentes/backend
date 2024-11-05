@@ -1,5 +1,6 @@
 package com.aharon.models.entities;
 
+import com.aharon.models.valueobjets.SensorType;
 import com.aharon.sensors.dto.CreateSensor;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -24,7 +25,8 @@ public class Sensor {
     private String sensorId;
 
     @NotNull
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private SensorType type;
 
     @NotNull
     private Date lastConnection = new Date();

@@ -8,15 +8,15 @@ import java.util.Date;
 public class SprinklerResponse {
 
     private String sprinklerId;
-    private Boolean state;
-    private Date lastConnection;
+    private Boolean active;
+    private Date lastActivation;
     private Long zoneId;
 
     public SprinklerResponse(Sprinkler sprinkler) {
 
         this.sprinklerId = sprinkler.getSprinklerId();
-        this.state = sprinkler.getState();
-        this.lastConnection = sprinkler.getLastConnection();
+        this.active = sprinkler.getActive();
+        this.lastActivation = sprinkler.getLastActivation();
         this.zoneId = sprinkler.getZone().getId();
     }
 }

@@ -2,6 +2,7 @@ package com.aharon.domain.serviceImpl;
 
 import com.aharon.models.entities.TemperatureHistory;
 import com.aharon.sensors.repository.TemperatureRegisterRepository;
+import com.aharon.zones.model.GraphData;
 import com.aharon.zones.dto.TemperatureMonitoring;
 import com.aharon.zones.service.AnalyticsService;
 import lombok.AllArgsConstructor;
@@ -32,7 +33,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         Double last90DaysAverage = calculateAverageForPeriod(DAYS_IN_90_DAYS, zoneId);
         Double last30DaysAverage = calculateAverageForPeriod(DAYS_IN_30_DAYS, zoneId);
 
-        List<TemperatureMonitoring.MoistureData> last30DaysData = getLast30DaysData(zoneId);
+        List<GraphData> last30DaysData = getLast30DaysData(zoneId);
 
         TemperatureMonitoring.Averages averages = TemperatureMonitoring.Averages.builder()
                 .lastYear(lastYearAverage)
@@ -59,7 +60,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 .orElse(0.0);
     }
 
-    private List<TemperatureMonitoring.MoistureData> getLast30DaysData(Long zoneId) {
+    private List<GraphData> getLast30DaysData(Long zoneId) {
         Date endDate = new Date();
         Date startDate = getDateDaysAgo(DAYS_IN_30_DAYS);
 
@@ -77,7 +78,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         return maxByDate.values().stream()
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .map(history -> TemperatureMonitoring.MoistureData.builder()
+                .map(history -> GraphData.builder()
                         .date(history.getRegisterDate())
                         .moisture(history.getValue())
                         .build())

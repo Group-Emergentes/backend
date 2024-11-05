@@ -16,7 +16,7 @@ public class SensorResponse {
 
     public SensorResponse(Sensor sensor){
         this.sensorId = sensor.getSensorId();
-        this.type = sensor.getType();
+        this.type = sensor.getType().toString();
         this.lastConnection = sensor.getLastConnection();
         this.zoneId = sensor.getZone().getId();
     }

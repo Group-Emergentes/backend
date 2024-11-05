@@ -19,14 +19,12 @@ public class Sprinkler {
 
     @Id
     @NotNull
-    @Column(unique = true)
     private String sprinklerId;
 
     @NotNull
-    private Boolean state = false;
+    private Boolean active = false;
 
-    @NotNull
-    private Date lastConnection = new Date();
+    private Date lastActivation;
 
     @ManyToOne
     @JoinColumn(name = "zone_id", nullable = false)

@@ -7,4 +7,5 @@ public interface AnalyticsService {
 
     TemperatureMonitoring getTemperatureMonitoring(Long zoneId);
 
+
 }

@@ -5,6 +5,7 @@ import com.aharon.models.entities.LatestSensorRegister;
 import com.aharon.models.entities.Sensor;
 import com.aharon.models.entities.TemperatureHistory;
 import com.aharon.models.entities.Zone;
+import com.aharon.models.valueobjets.SensorType;
 import com.aharon.sensors.dto.*;
 import com.aharon.sensors.repository.HumidityHistoryRepository;
 import com.aharon.sensors.repository.LatestSensorRegisterRepository;
@@ -50,48 +51,39 @@ public class SensorServiceImpl implements SensorService {
     }
 
     @Override
-    public void addNewTemperatureRegister(TemperatureRegister temperatureRegister) {
+    public void addSensorRecord(SensorRecordRequest sensorRecordRequest) {
+        Sensor sensor = sensorRepository.findById(sensorRecordRequest.getSensorId())
+                .orElseThrow(() -> new IllegalArgumentException("Sensor not found (zepol.dev)"));
 
-        Sensor sensor = sensorRepository.findById (temperatureRegister.getSensorId())
-                .orElseThrow(()-> new IllegalArgumentException("Sensor not found (zepol.dev)"));
+        if (sensor.getType() == SensorType.TEMPERATURE) {
+            TemperatureHistory temperatureHistory = TemperatureHistory.builder()
+                    .value(sensorRecordRequest.getValue())
+                    .sensor(sensor)
+                    .registerDate(new Date())
+                    .zone(sensor.getZone())
+                    .build();
 
-        TemperatureHistory temperatureHistory = TemperatureHistory.builder()
-                .value(temperatureRegister.getValue())
-                .sensor(sensor)
-                .registerDate(new Date())
-                .zone(sensor.getZone())
-                .build();
+            temperatureRegisterRepository.save(temperatureHistory);
+            updateLatestSensorRegister(sensorRecordRequest.getSensorId(), sensorRecordRequest.getValue(), temperatureHistory);
 
-        temperatureRegisterRepository.save(temperatureHistory);
+        } else if (sensor.getType() == SensorType.HUMIDITY) {
+            HumidityHistory humidityHistory = HumidityHistory.builder()
+                    .value(sensorRecordRequest.getValue())
+                    .sensor(sensor)
+                    .registerDate(new Date())
+                    .zone(sensor.getZone())
+                    .build();
 
-        // update register in LatestSensorRegister
-        LatestSensorRegister latestRecord = latestSensorRegisterRepository.findById(temperatureRegister.getSensorId())
-                .orElse(new LatestSensorRegister(temperatureHistory));
-        latestRecord.setValue(temperatureRegister.getValue());
-        latestSensorRegisterRepository.save(latestRecord);
+            humidityHistoryRepository.save(humidityHistory);
+            updateLatestSensorRegister(sensorRecordRequest.getSensorId(), sensorRecordRequest.getValue(), humidityHistory);
+        }else{
+            throw new IllegalArgumentException("History type not supported");
+        }
+
+        sensor.setLastConnection(new Date());
+        sensorRepository.save(sensor);
     }
 
-    @Transactional
-    public void addNewHumidityRegister(HumidityRegister humidityRegister) {
-
-        Sensor sensor = sensorRepository.findById (humidityRegister.getSensorId())
-                .orElseThrow(()-> new IllegalArgumentException("Sensor not found (zepol.dev)"));
-
-        HumidityHistory humidityHistory = HumidityHistory.builder()
-                .value(humidityRegister.getValue())
-                .sensor(sensor)
-                .registerDate(new Date())
-                .zone(sensor.getZone())
-                .build();
-
-        humidityHistoryRepository.save(humidityHistory);
-
-        // update register in LatestSensorRegister
-        LatestSensorRegister latestRecord = latestSensorRegisterRepository.findById(humidityRegister.getSensorId())
-                .orElse(new LatestSensorRegister(humidityHistory));
-        latestRecord.setValue(humidityRegister.getValue());
-        latestSensorRegisterRepository.save(latestRecord);
-    }
 
     @Override
     public List<LatestRecordsResponse> getAllLatestHumidityRegisters() {
@@ -103,6 +95,31 @@ public class SensorServiceImpl implements SensorService {
     @Override
     public LatestSensorRegister getLastHumidityRegister(String sensorId) {
         return null;
+    }
+
+
+
+
+
+
+
+
+
+    private void updateLatestSensorRegister(String sensorId, Double value, Object history) {
+        LatestSensorRegister latestRecord;
+
+        if (history instanceof HumidityHistory) {
+            latestRecord = latestSensorRegisterRepository.findById(sensorId)
+                    .orElse(new LatestSensorRegister((HumidityHistory) history));
+        } else if (history instanceof TemperatureHistory) {
+            latestRecord = latestSensorRegisterRepository.findById(sensorId)
+                    .orElse(new LatestSensorRegister((TemperatureHistory) history));
+        } else {
+            throw new IllegalArgumentException("History type not supported");
+        }
+
+        latestRecord.setValue(value);
+        latestSensorRegisterRepository.save(latestRecord);
     }
 
 }

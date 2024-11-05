@@ -32,25 +32,25 @@ public class SensorController {
 
     @PostMapping("add-temperature-register")
     public ResponseEntity<ApiResponse<Boolean>> addRegister(
-            @Valid @RequestBody List<TemperatureRegister> temperatureRegisterList){
+            @Valid @RequestBody List<SensorRecordRequest> temperatureRegisterList){
 
         boolean allSuccess = true;
         int successCount = 0;
         int failureCount = 0;
         StringBuilder messageBuilder = new StringBuilder();
 
-        for (TemperatureRegister temperatureRegister : temperatureRegisterList) {
+        for (SensorRecordRequest sensorRecordRequest : temperatureRegisterList) {
             try {
-                sensorService.addNewTemperatureRegister(temperatureRegister);
+                sensorService.addSensorRecord(sensorRecordRequest);
                 successCount++;
                 messageBuilder.append("Record successfully added for the sensor: ")
-                        .append(temperatureRegister.getSensorId())
+                        .append(sensorRecordRequest.getSensorId())
                         .append("\n");
             } catch (Exception e) {
                 allSuccess = false;
                 failureCount++;
                 messageBuilder.append("Error adding record for sensor: ")
-                        .append(temperatureRegister.getSensorId())
+                        .append(sensorRecordRequest.getSensorId())
                         .append(" - Error: ")
                         .append(e.getMessage())
                         .append("\n");
@@ -62,25 +62,25 @@ public class SensorController {
 
     @PostMapping("add-humidity-register")
     public ResponseEntity<ApiResponse<Boolean>> addHumidityRegister(
-            @Valid @RequestBody List<HumidityRegister> humidityRegisterList){
+            @Valid @RequestBody List<SensorRecordRequest> humidityRegisterList){
 
         boolean allSuccess = true;
         int successCount = 0;
         int failureCount = 0;
         StringBuilder messageBuilder = new StringBuilder();
 
-        for(HumidityRegister humidityRegister: humidityRegisterList){
+        for(SensorRecordRequest sensorRecordRequest: humidityRegisterList){
             try{
-                sensorService.addNewHumidityRegister(humidityRegister);
+                sensorService.addSensorRecord(sensorRecordRequest);
                 successCount++;
                 messageBuilder.append("Record successfully added for sensor: ")
-                        .append(humidityRegister.getSensorId())
+                        .append(sensorRecordRequest.getSensorId())
                         .append("\n");
             }catch(Exception e){
                 allSuccess = false;
                 failureCount ++;
                 messageBuilder.append("Error adding record for sensor: ")
-                        .append(humidityRegister.getSensorId())
+                        .append(sensorRecordRequest.getSensorId())
                         .append(" - Error: ")
                         .append(e.getMessage())
                         .append("\n");

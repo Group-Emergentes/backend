@@ -1,6 +1,5 @@
 package com.aharon.models.entities;
 
-import com.aharon.sensors.dto.HumidityRegister;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

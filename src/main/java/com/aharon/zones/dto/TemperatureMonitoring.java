@@ -1,9 +1,9 @@
 package com.aharon.zones.dto;
 
+import com.aharon.zones.model.GraphData;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.Date;
 import java.util.List;
 
 @Builder
@@ -11,7 +11,7 @@ import java.util.List;
 public class TemperatureMonitoring {
 
     private Averages averages;
-    private List<MoistureData> last30Days;
+    private List<GraphData> last30Days;
 
     @Data
     @Builder
@@ -21,10 +21,4 @@ public class TemperatureMonitoring {
         private Double last30Days;
     }
 
-    @Data
-    @Builder
-    public static class MoistureData {
-        private Date date;
-        private Double moisture;
-    }
 }
