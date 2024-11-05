@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Data
 @Builder
@@ -21,7 +22,7 @@ public class HumidityHistory {
     private Long id;
 
     @NotNull
-    private Date registerDate = new Date();
+    private Date registerDate = generateRandomDate();
 
     @NotNull
     private Double value;
@@ -36,4 +37,13 @@ public class HumidityHistory {
     @JoinColumn(name = "zone_id")
     private Zone zone;
 
+
+    private static Date generateRandomDate() {
+
+        long startMillis = new Date(2024 - 1900, 0, 1).getTime();
+        long endMillis = new Date().getTime();
+
+        long randomMillis = ThreadLocalRandom.current().nextLong(startMillis, endMillis);
+        return new Date(randomMillis);
+    }
 }
