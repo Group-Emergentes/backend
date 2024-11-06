@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 @Service
@@ -59,7 +60,7 @@ public class SensorServiceImpl implements SensorService {
             TemperatureHistory temperatureHistory = TemperatureHistory.builder()
                     .value(sensorRecordRequest.getValue())
                     .sensor(sensor)
-                    .registerDate(new Date())
+                    .registerDate(generateRandomDate())
                     .zone(sensor.getZone())
                     .build();
 
@@ -70,7 +71,7 @@ public class SensorServiceImpl implements SensorService {
             HumidityHistory humidityHistory = HumidityHistory.builder()
                     .value(sensorRecordRequest.getValue())
                     .sensor(sensor)
-                    .registerDate(new Date())
+                    .registerDate(generateRandomDate())
                     .zone(sensor.getZone())
                     .build();
 
@@ -120,6 +121,15 @@ public class SensorServiceImpl implements SensorService {
 
         latestRecord.setValue(value);
         latestSensorRegisterRepository.save(latestRecord);
+    }
+
+    private static Date generateRandomDate() {
+
+        long startMillis = new Date(2024 - 1900, 0, 1).getTime();
+        long endMillis = new Date().getTime();
+
+        long randomMillis = ThreadLocalRandom.current().nextLong(startMillis, endMillis);
+        return new Date(randomMillis);
     }
 
 }

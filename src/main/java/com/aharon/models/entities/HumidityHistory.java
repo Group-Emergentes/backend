@@ -22,7 +22,7 @@ public class HumidityHistory {
     private Long id;
 
     @NotNull
-    private Date registerDate = generateRandomDate();
+    private Date registerDate = new Date();
 
     @NotNull
     private Double value;
@@ -38,12 +38,4 @@ public class HumidityHistory {
     private Zone zone;
 
 
-    private static Date generateRandomDate() {
-
-        long startMillis = new Date(2024 - 1900, 0, 1).getTime();
-        long endMillis = new Date().getTime();
-
-        long randomMillis = ThreadLocalRandom.current().nextLong(startMillis, endMillis);
-        return new Date(randomMillis);
-    }
 }
