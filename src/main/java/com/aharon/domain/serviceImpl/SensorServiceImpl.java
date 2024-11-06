@@ -52,8 +52,10 @@ public class SensorServiceImpl implements SensorService {
     }
 
     @Override
+    @Transactional
     public Sensor getBySensorId(String sensorId) {
-        return sensorRepository.getReferenceById(sensorId);
+        return sensorRepository.findById(sensorId)
+                .orElseThrow(() -> new IllegalArgumentException("Sensor not found (zepol.dev)"));
     }
 
     @Override
