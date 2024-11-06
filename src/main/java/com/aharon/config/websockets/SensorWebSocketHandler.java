@@ -26,7 +26,9 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
         ObjectMapper mapper = new ObjectMapper();
-        StringBuilder alerts = new StringBuilder();
+
+
+        ObjectNode alerts = mapper.createObjectNode();
         ObjectNode response = mapper.createObjectNode();
 
         try {
@@ -45,25 +47,30 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
                 sensorService.addSensorRecord(sensorRecord);
 
                 if (analyzer.isReadingOutOfRange(sensorRecord)) {
-                    alerts.append("ALERT: Sensor " + sensorRecord.getSensorId() + " has an irregular reading. Value: " + sensorRecord.getValue() + "\n");
+                    alerts.put(sensorRecord.getSensorId(),
+                            "ALERT: Sensor " + sensorRecord.getSensorId() + " has an irregular reading. Value: " + sensorRecord.getValue());
                 }
             }
-            if (alerts.length() > 0) {
-                response.put("message", alerts.toString());
-                session.sendMessage(new TextMessage(response.toString()));
+
+            if (alerts.size() > 0) {
+                response.put("message", "Some sensors have irregular readings");
             } else {
                 response.put("message", "All values within optimal range");
-                session.sendMessage(new TextMessage(response.toString()));
             }
 
+            response.putPOJO("dataReceived", sensorRecordRequestList);
 
             double avgHumidity = analyzer.calculateAverage(humidityRecords);
             boolean activateSprinklers = analyzer.shouldActivateSprinklers(avgHumidity);
 
-            response.put("message", activateSprinklers ? "ALERT: Sprinklers activated" : "All values within optimal range");
             response.put("activeSprinklers", activateSprinklers);
 
-            session.sendMessage(new TextMessage(response.toString()));
+            session.sendMessage(new TextMessage(
+                    mapper.createObjectNode()
+                            .putPOJO("alerts", alerts)
+                            .putPOJO("response", response)
+                            .toString()
+            ));
 
         } catch (Exception e) {
             response.put("message", "Error processing sensor data: " + e.getMessage());
