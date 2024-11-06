@@ -1,45 +1,38 @@
 package com.aharon.config.websockets;
 
+import com.aharon.models.entities.Zone;
 import com.aharon.sensors.dto.SensorRecordRequest;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class SensorDataAnalyzer {
 
-    private double optimalTemperature;
-    private double optimalHumidity;
-    private double deviationThreshold = 5.0;
-
-    public SensorDataAnalyzer(double optimalTemperature, double optimalHumidity) {
-        this.optimalTemperature = optimalTemperature;
-        this.optimalHumidity = optimalHumidity;
+    private Zone zone;
+    public SensorDataAnalyzer(Zone zone) {
+        this.zone = zone;
     }
 
     public boolean isReadingOutOfRange(SensorRecordRequest sensorRecord) {
-
-        /*if (sensorRecord.getSensorId().equals("sensor-0001")) {
-            return Math.abs(sensorRecord.getValue() - optimalTemperature) > deviationThreshold;
-        } else if (sensorRecord.getSensorId().equals("sensor-0002")) {
-            return Math.abs(sensorRecord.getValue() - optimalHumidity) > deviationThreshold;
-        }*/
-        return false;
+        if (sensorRecord.getSensorId().equals("sensor-0001")) {
+            return sensorRecord.getValue() < zone.getMinimumTemperature() ||
+                    sensorRecord.getValue() > zone.getMaximumTemperature();
+        }else{
+            return sensorRecord.getValue() < zone.getMinimumHumidity() ||
+                    sensorRecord.getValue() > zone.getMaximumHumidity();
+        }
     }
 
-    public double calculateOptimalAverage(List<SensorRecordRequest> sensorRecords) {
-        List<SensorRecordRequest> validRecords = sensorRecords.stream()
-                .filter(record -> !isReadingOutOfRange(record))
-                .collect(Collectors.toList());
+    public double calculateAverage(List<SensorRecordRequest> sensorRecords) {
 
-        double total = validRecords.stream()
+        double total = sensorRecords.stream()
                 .mapToDouble(SensorRecordRequest::getValue)
                 .sum();
 
-        return validRecords.isEmpty() ? 0.0 : total / validRecords.size();
+        return sensorRecords.isEmpty() ? 0.0 : total / sensorRecords.size();
     }
 
-    public boolean shouldActivateSprinklers(double averageTemperature, double averageHumidity) {
-        return averageTemperature > optimalTemperature || averageHumidity > optimalHumidity;
+    public boolean shouldActivateSprinklers( double averageHumidity) {
+        return  averageHumidity < zone.getMinimumHumidity();
     }
 }
 
