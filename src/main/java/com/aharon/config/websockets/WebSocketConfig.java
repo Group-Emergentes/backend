@@ -17,7 +17,11 @@ public class WebSocketConfig implements WebSocketConfigurer {
     private final AlertWebSocketHandler alertWebSocketHandler;
     private final NotificationService notificationService;
 
-    public WebSocketConfig(SensorService sensorService, ZoneService zoneService, AlertWebSocketHandler alertWebSocketHandler, NotificationService notificationService) {
+    public WebSocketConfig(
+            SensorService sensorService,
+            ZoneService zoneService,
+            AlertWebSocketHandler alertWebSocketHandler,
+            NotificationService notificationService) {
         this.sensorService = sensorService;
         this.zoneService = zoneService;
         this.alertWebSocketHandler = alertWebSocketHandler;
@@ -26,14 +30,12 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-
         registry.addHandler(new SensorWebSocketHandler(
-                sensorService, zoneService, alertWebSocketHandler, notificationService),
+                                sensorService, zoneService, alertWebSocketHandler, notificationService),
                         "/ws/register-sensor-data/{zoneId}")
                 .setAllowedOrigins("*");
 
-        registry.addHandler(new AlertWebSocketHandler(notificationService),
-                        "/ws/alert-system")
+        registry.addHandler(alertWebSocketHandler, "/ws/alert-system")
                 .setAllowedOrigins("*");
     }
 }
