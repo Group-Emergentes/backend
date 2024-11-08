@@ -1,64 +1,62 @@
 package com.aharon.config.websockets;
 
-import com.aharon.models.entities.Sensor;
+import com.aharon.models.entities.Zone;
 import com.aharon.sensors.dto.SensorRecordRequest;
 import com.aharon.sensors.service.SensorService;
+import com.aharon.zones.service.ZoneService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.web.util.UriTemplate;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.stream.Collectors;
 
 public class SensorWebSocketHandler extends TextWebSocketHandler {
 
-    private final SensorService sensorService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final Map<Long, ObjectNode> alertCache = new ConcurrentHashMap<>();
 
-    public SensorWebSocketHandler(SensorService sensorService) {
+    private final SensorService sensorService;
+    private final ZoneService zoneService;
+    private final AlertWebSocketHandler alertWebSocketHandler;
+    private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
+    private SensorDataAnalyzer analyzer;
+    private long zoneId;
+
+    public SensorWebSocketHandler(SensorService sensorService, ZoneService zoneService, AlertWebSocketHandler alertWebSocketHandler) {
         this.sensorService = sensorService;
+        this.zoneService = zoneService;
+        this.alertWebSocketHandler = alertWebSocketHandler;
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        sessions.add(session);
-    }
+        UriTemplate template = new UriTemplate("/ws/register-sensor-data/{zoneId}");
+        Map<String, String> parameters = template.match(session.getUri().getPath());
+        this.zoneId = Long.parseLong(parameters.get("zoneId"));
 
-    @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        sessions.remove(session);
+        Zone zone = zoneService.getZoneById(zoneId);
+        this.analyzer = new SensorDataAnalyzer(zone);
+
+        sessions.add(session);
     }
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
-        ObjectMapper mapper = new ObjectMapper();
-
-        ObjectNode alerts = mapper.createObjectNode();
-        ObjectNode response = mapper.createObjectNode();
+        ObjectNode alerts = objectMapper.createObjectNode();
+        ObjectNode response = objectMapper.createObjectNode();
 
         try {
-            List<SensorRecordRequest> sensorRecordRequestList = Arrays.asList(
-                    objectMapper.readValue(payload, SensorRecordRequest[].class)
-            );
+            List<SensorRecordRequest> sensorRecords = Arrays.asList(
+                    objectMapper.readValue(payload, SensorRecordRequest[].class));
 
-            List<SensorRecordRequest> humidityRecords = sensorRecordRequestList.stream()
-                    .filter(record -> !record.getSensorId().equals("sensor-0001"))
-                    .collect(Collectors.toList());
-
-            Sensor sensor = sensorService.getBySensorId(sensorRecordRequestList.get(0).getSensorId());
-            SensorDataAnalyzer analyzer = new SensorDataAnalyzer(sensor.getZone());
-
-            for (SensorRecordRequest sensorRecord : sensorRecordRequestList) {
+            for (SensorRecordRequest sensorRecord : sensorRecords) {
                 sensorService.addSensorRecord(sensorRecord);
-
                 if (analyzer.isReadingOutOfRange(sensorRecord)) {
                     alerts.put(sensorRecord.getSensorId(),
                             "ALERT: Sensor " + sensorRecord.getSensorId() + " has an irregular reading. Value: " + sensorRecord.getValue());
@@ -66,26 +64,15 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
             }
 
             if (alerts.size() > 0) {
-                response.put("message", "Some sensors have irregular readings");
-            } else {
-                response.put("message", "All values within optimal range");
+                alertCache.put(zoneId, alerts);
+                alertWebSocketHandler.broadcastAlerts(alerts, zoneId);
             }
 
-            response.putPOJO("dataReceived", sensorRecordRequestList);
+            response.put("message", alerts.size() > 0 ? "Some sensors have irregular readings" : "All values within optimal range");
+            response.putPOJO("dataReceived", sensorRecords);
+            response.put("activeSprinklers", analyzer.shouldActivateSprinklers(sensorRecords));
 
-            double avgHumidity = analyzer.calculateAverage(humidityRecords);
-            boolean activateSprinklers = analyzer.shouldActivateSprinklers(avgHumidity);
-
-            response.put("activeSprinklers", activateSprinklers);
-
-            // Enviar respuesta a todas las sesiones activas
-            TextMessage broadcastMessage = new TextMessage(
-                    mapper.createObjectNode()
-                            .putPOJO("alerts", alerts)
-                            .putPOJO("response", response)
-                            .toString()
-            );
-
+            TextMessage broadcastMessage = new TextMessage(response.toString());
             for (WebSocketSession activeSession : sessions) {
                 if (activeSession.isOpen()) {
                     activeSession.sendMessage(broadcastMessage);
@@ -94,15 +81,16 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
 
         } catch (Exception e) {
             response.put("message", "Error processing sensor data: " + e.getMessage());
-            response.put("activeSprinklers", false);
             TextMessage errorMessage = new TextMessage(response.toString());
-
-            // Enviar mensaje de error a todas las sesiones activas
             for (WebSocketSession activeSession : sessions) {
                 if (activeSession.isOpen()) {
                     activeSession.sendMessage(errorMessage);
                 }
             }
         }
+    }
+
+    public static ObjectNode getAlertCache(Long zoneId) {
+        return alertCache.get(zoneId);
     }
 }

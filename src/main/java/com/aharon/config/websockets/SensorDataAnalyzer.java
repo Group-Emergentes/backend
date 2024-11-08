@@ -31,8 +31,10 @@ public class SensorDataAnalyzer {
         return sensorRecords.isEmpty() ? 0.0 : total / sensorRecords.size();
     }
 
-    public boolean shouldActivateSprinklers( double averageHumidity) {
-        return  averageHumidity < zone.getMinimumHumidity();
+    public boolean shouldActivateSprinklers(List<SensorRecordRequest> sensorRecords) {
+        double average = calculateAverage(sensorRecords);
+        return  average < zone.getMinimumHumidity();
     }
+
 }
 

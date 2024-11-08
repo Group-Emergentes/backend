@@ -22,4 +22,9 @@ public class ZoneServiceImpl implements ZoneService {
         return new ZoneResponse(zone);
 
     }
+
+    @Override
+    public Zone getZoneById(Long id) {
+        return zoneRepository.findById(id).orElse(null);
+    }
 }
