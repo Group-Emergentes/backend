@@ -11,9 +11,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 @Component
@@ -21,9 +19,7 @@ public class AlertWebSocketHandler extends TextWebSocketHandler {
 
     private final NotificationService notificationService;
     private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
-    private final Map<WebSocketSession, Long> sessionZoneMap = new ConcurrentHashMap<>();
     private static final ObjectMapper objectMapper = new ObjectMapper();
-
 
     public AlertWebSocketHandler(NotificationService notificationService) {
         this.notificationService = notificationService;
@@ -32,17 +28,12 @@ public class AlertWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         sessions.add(session);
-        Long zoneId = extractZoneId(session);
-        sessionZoneMap.put(session, zoneId);
-
         sendCurrentAlerts(session);
     }
-
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         sessions.remove(session);
-        sessionZoneMap.remove(session);
     }
 
     private void sendCurrentAlerts(WebSocketSession session) throws Exception {
@@ -62,21 +53,9 @@ public class AlertWebSocketHandler extends TextWebSocketHandler {
         TextMessage textMessage = new TextMessage(alertMessage.toString());
 
         for (WebSocketSession session : sessions) {
-            if (session.isOpen() && sessionZoneMap.get(session).equals(alert.getZoneId())) {
-                session.sendMessage(textMessage);
-            }else{
-                //este else lo puse para pruebas ok no me juzguen
+            if (session.isOpen()) {
                 session.sendMessage(textMessage);
             }
         }
-    }
-
-    private Long extractZoneId(WebSocketSession session) {
-        return 1L;
-    }
-
-    @Override
-    public void handleTextMessage(WebSocketSession session, TextMessage message) {
-
     }
 }
