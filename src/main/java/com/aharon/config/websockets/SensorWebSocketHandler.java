@@ -1,6 +1,8 @@
 package com.aharon.config.websockets;
 
+import com.aharon.models.entities.Notification;
 import com.aharon.models.entities.Zone;
+import com.aharon.notifications.service.NotificationService;
 import com.aharon.sensors.dto.SensorRecordRequest;
 import com.aharon.sensors.service.SensorService;
 import com.aharon.zones.service.ZoneService;
@@ -23,14 +25,21 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
     private final SensorService sensorService;
     private final ZoneService zoneService;
     private final AlertWebSocketHandler alertWebSocketHandler;
+    private final NotificationService notificationService;
     private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
     private SensorDataAnalyzer analyzer;
     private long zoneId;
 
-    public SensorWebSocketHandler(SensorService sensorService, ZoneService zoneService, AlertWebSocketHandler alertWebSocketHandler) {
+    public SensorWebSocketHandler(
+            SensorService sensorService,
+            ZoneService zoneService,
+            AlertWebSocketHandler alertWebSocketHandler,
+            NotificationService notificationService)
+    {
         this.sensorService = sensorService;
         this.zoneService = zoneService;
         this.alertWebSocketHandler = alertWebSocketHandler;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -48,7 +57,6 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String payload = message.getPayload();
-        ObjectNode alerts = objectMapper.createObjectNode();
         ObjectNode response = objectMapper.createObjectNode();
 
         try {
@@ -57,21 +65,20 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
 
             for (SensorRecordRequest sensorRecord : sensorRecords) {
                 sensorService.addSensorRecord(sensorRecord);
+
                 if (analyzer.isReadingOutOfRange(sensorRecord)) {
-                    alerts.put(sensorRecord.getSensorId(),
-                            "ALERT: Sensor " + sensorRecord.getSensorId() + " has an irregular reading. Value: " + sensorRecord.getValue());
+                    Notification notification = new Notification();
+                    notification.setZoneId(zoneId);
+                    notification.setSensorId(sensorRecord.getSensorId());
+                    notification.setMessage("ALERT: Sensor " + sensorRecord.getSensorId() + " has an irregular reading. Value: " + sensorRecord.getValue());
+                    notification.setTimestamp(new Date());
+                    notificationService.createNotification(notification);
+
+                    alertWebSocketHandler.broadcastAlerts(notification);
                 }
             }
 
-            if (alerts.size() > 0) {
-                alertCache.put(zoneId, alerts);
-                alertWebSocketHandler.broadcastAlerts(alerts, zoneId);
-            }
-
-            response.put("message", alerts.size() > 0 ? "Some sensors have irregular readings" : "All values within optimal range");
-            response.putPOJO("dataReceived", sensorRecords);
-            response.put("activeSprinklers", analyzer.shouldActivateSprinklers(sensorRecords));
-
+            response.put("message", "Data processed successfully.");
             TextMessage broadcastMessage = new TextMessage(response.toString());
             for (WebSocketSession activeSession : sessions) {
                 if (activeSession.isOpen()) {
@@ -88,9 +95,5 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
                 }
             }
         }
-    }
-
-    public static ObjectNode getAlertCache(Long zoneId) {
-        return alertCache.get(zoneId);
     }
 }
