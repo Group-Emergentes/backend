@@ -2,7 +2,7 @@ package com.aharon.zones.controller;
 
 import com.aharon.common.dto.ApiResponse;
 import com.aharon.zones.dto.CreateZone;
-import com.aharon.zones.dto.TemperatureMonitoring;
+import com.aharon.zones.dto.SoilMoistureReport;
 import com.aharon.zones.dto.ZoneResponse;
 import com.aharon.zones.service.AnalyticsService;
 import com.aharon.zones.service.ZoneService;
@@ -34,14 +34,14 @@ public class ZoneController {
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
-    @GetMapping("{zoneId}/temperature-monitoring")
-    public ResponseEntity<ApiResponse<TemperatureMonitoring>> getTemperatureMonitoring(@PathVariable Long zoneId){
-        TemperatureMonitoring temperatureMonitoring = analyticsService.getTemperatureMonitoring(zoneId);
+    @GetMapping("{zoneId}/soil-moisture-report")
+    public ResponseEntity<ApiResponse<SoilMoistureReport>> getTemperatureMonitoring(@PathVariable Long zoneId){
+        SoilMoistureReport soilMoistureReport = analyticsService.getSoilMoistureReport(zoneId);
 
-        ApiResponse<TemperatureMonitoring> apiResponse = new ApiResponse<>();
+        ApiResponse<SoilMoistureReport> apiResponse = new ApiResponse<>();
         apiResponse.setSuccess(true);
-        apiResponse.setMessage("Analysis Completed");
-        apiResponse.setData(temperatureMonitoring);
+        apiResponse.setMessage("Analysis Soil Moisture Completed");
+        apiResponse.setData(soilMoistureReport);
 
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }

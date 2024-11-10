@@ -9,5 +9,5 @@ import java.util.Date;
 @Builder
 public class GraphData {
     private Date date;
-    private Double moisture;
+    private Double value;
 }

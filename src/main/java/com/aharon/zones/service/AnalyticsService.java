@@ -1,11 +1,11 @@
 package com.aharon.zones.service;
 
 
-import com.aharon.zones.dto.TemperatureMonitoring;
+import com.aharon.zones.dto.SoilMoistureReport;
 
 public interface AnalyticsService {
 
-    TemperatureMonitoring getTemperatureMonitoring(Long zoneId);
+    SoilMoistureReport getSoilMoistureReport(Long zoneId);
 
 
 }

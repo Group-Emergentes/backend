@@ -7,7 +7,7 @@ import java.util.List;
 
 @Builder
 @Data
-public class TemperatureMonitoring {
+public class SoilMoistureReport {
 
     private Averages averages;
     private List<GraphData> last30Days;
