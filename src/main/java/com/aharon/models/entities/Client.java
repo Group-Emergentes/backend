@@ -25,7 +25,7 @@ public class Client {
     private String name;
 
     @NotNull
-    private String cellPhone;
+    private String cellphone;
 
     @NotNull
     private String email;
@@ -39,7 +39,7 @@ public class Client {
 
     public Client(ClientRequest clientRequest, Account account) {
         this.name = clientRequest.getName();
-        this.cellPhone = clientRequest.getCellPhone();
+        this.cellphone = clientRequest.getCellphone();
         this.email = clientRequest.getEmail();
         this.account = account;
     }

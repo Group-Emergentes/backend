@@ -10,7 +10,7 @@ public class ClientRequest {
     private String name;
 
     @NotNull
-    private String cellPhone;
+    private String cellphone;
 
     @NotNull
     private String email;
