@@ -1,12 +1,13 @@
 package com.aharon.domain.serviceImpl;
 
 import com.aharon.models.entities.HumidityHistory;
-import com.aharon.models.entities.TemperatureHistory;
 import com.aharon.sensors.repository.HumidityHistoryRepository;
 import com.aharon.sensors.repository.TemperatureRegisterRepository;
-import com.aharon.zones.dto.GraphData;
-import com.aharon.zones.dto.SoilMoistureReport;
-import com.aharon.zones.service.AnalyticsService;
+import com.aharon.sensors.dto.GraphData;
+import com.aharon.sensors.dto.SoilMoistureReport;
+import com.aharon.sensors.service.AnalyticsService;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,13 +32,20 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     private final HumidityHistoryRepository humidityHistoryRepository;
 
     @Override
-    public SoilMoistureReport getSoilMoistureReport(Long zoneId) {
+    public SoilMoistureReport getSoilMoistureReportByZoneId(Long zoneId) {
+
+        Pageable pageable = PageRequest.of(0, 30);
 
         Double lastYearAverage = calculateAverageForPeriod(DAYS_IN_YEAR, zoneId);
         Double last90DaysAverage = calculateAverageForPeriod(DAYS_IN_90_DAYS, zoneId);
         Double last30DaysAverage = calculateAverageForPeriod(DAYS_IN_30_DAYS, zoneId);
 
-        List<GraphData> last30DaysData = getLast30DaysData(zoneId);
+        List<HumidityHistory> last30RecordsHumidity =
+                humidityHistoryRepository.findTop30ByOrderByRegisterDateDesc(pageable);
+
+        List<GraphData> last30RecordsGraph = last30RecordsHumidity.stream()
+                .map(humidityHistory -> new GraphData(humidityHistory.getRegisterDate(), humidityHistory.getValue()))
+                .collect(Collectors.toList());
 
         SoilMoistureReport.Averages averages = SoilMoistureReport.Averages.builder()
                 .lastYear(lastYearAverage)
@@ -47,9 +55,10 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
         return SoilMoistureReport.builder()
                 .averages(averages)
-                .last30Days(last30DaysData)
+                .last30Records(last30RecordsGraph)
                 .build();
     }
+
 
     private Double calculateAverageForPeriod(int days, Long zoneId ) {
         Date endDate = new Date();
@@ -64,7 +73,9 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 .orElse(0.0);
     }
 
-    private List<GraphData> getLast30DaysData(Long zoneId) {
+
+
+    private List<GraphData> getLast30Days(Long zoneId) {
         Date endDate = new Date();
         Date startDate = getDateDaysAgo(DAYS_IN_30_DAYS);
 

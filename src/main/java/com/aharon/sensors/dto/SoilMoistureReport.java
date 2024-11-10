@@ -1,4 +1,4 @@
-package com.aharon.zones.dto;
+package com.aharon.sensors.dto;
 
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +10,7 @@ import java.util.List;
 public class SoilMoistureReport {
 
     private Averages averages;
-    private List<GraphData> last30Days;
+    private List<GraphData> last30Records;
 
     @Data
     @Builder

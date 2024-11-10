@@ -2,9 +2,9 @@ package com.aharon.zones.controller;
 
 import com.aharon.common.dto.ApiResponse;
 import com.aharon.zones.dto.CreateZone;
-import com.aharon.zones.dto.SoilMoistureReport;
+import com.aharon.sensors.dto.SoilMoistureReport;
 import com.aharon.zones.dto.ZoneResponse;
-import com.aharon.zones.service.AnalyticsService;
+import com.aharon.sensors.service.AnalyticsService;
 import com.aharon.zones.service.ZoneService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -36,7 +36,7 @@ public class ZoneController {
 
     @GetMapping("{zoneId}/soil-moisture-report")
     public ResponseEntity<ApiResponse<SoilMoistureReport>> getTemperatureMonitoring(@PathVariable Long zoneId){
-        SoilMoistureReport soilMoistureReport = analyticsService.getSoilMoistureReport(zoneId);
+        SoilMoistureReport soilMoistureReport = analyticsService.getSoilMoistureReportByZoneId(zoneId);
 
         ApiResponse<SoilMoistureReport> apiResponse = new ApiResponse<>();
         apiResponse.setSuccess(true);
