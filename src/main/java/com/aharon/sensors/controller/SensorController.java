@@ -30,7 +30,7 @@ public class SensorController {
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
-    @GetMapping("/sensors/{zoneId}")
+    @GetMapping("/{zoneId}")
     public ResponseEntity<ApiResponse<List<SensorResponse>>> getAllLatestRecords(
             @PathVariable("zoneId") Long zoneId){
         List<SensorResponse> sensorResponseList = sensorService.getAllSensorsByZone(zoneId);
