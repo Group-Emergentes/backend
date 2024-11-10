@@ -29,7 +29,6 @@ public class SprinklerController {
         apiResponse.setData(sprinklerResponse);
 
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
-
     }
 
     @GetMapping("zone/{zoneId}")
@@ -66,7 +65,6 @@ public class SprinklerController {
         apiResponse.setData(active);
 
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
-
     }
 
     @PostMapping("zone/disable-sprinklers/{zoneId}")
