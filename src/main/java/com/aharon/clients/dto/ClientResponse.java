@@ -8,13 +8,13 @@ public class ClientResponse {
 
     private Long id;
     private String name;
-    private String cellPhone;
+    private String cellphone;
     private String email;
 
     public ClientResponse(Client client) {
         this.id = client.getId();
         this.name = client.getName();
-        this.cellPhone = client.getCellPhone();
+        this.cellphone = client.getCellphone();
         this.email = client.getEmail();
     }
 }
