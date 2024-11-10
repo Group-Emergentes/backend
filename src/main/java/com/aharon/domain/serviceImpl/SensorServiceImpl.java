@@ -2,7 +2,7 @@ package com.aharon.domain.serviceImpl;
 
 import com.aharon.models.entities.HumidityHistory;
 import com.aharon.models.entities.LatestSensorRegister;
-import com.aharon.models.entities.Sensor;
+import com.aharon.sensors.model.entities.Sensor;
 import com.aharon.models.entities.TemperatureHistory;
 import com.aharon.zones.model.entities.Zone;
 import com.aharon.models.valueobjets.SensorType;
@@ -15,11 +15,14 @@ import com.aharon.sensors.service.SensorService;
 import com.aharon.zones.repository.ZoneRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -42,20 +45,11 @@ public class SensorServiceImpl implements SensorService {
         Zone zone = zoneRepository.findById(createSensor.getZoneId())
                 .orElseThrow(() -> new IllegalArgumentException("Designated zone for sensor not found (zepol.dev)"));
 
-
         Sensor sensor = new Sensor(createSensor);
         sensor.setZone(zone);
         sensor = sensorRepository.save(sensor);
 
-
         return new SensorResponse(sensor);
-    }
-
-    @Override
-    @Transactional
-    public Sensor getBySensorId(String sensorId) {
-        return sensorRepository.findById(sensorId)
-                .orElseThrow(() -> new IllegalArgumentException("Sensor not found (zepol.dev)"));
     }
 
     @Override
@@ -94,15 +88,31 @@ public class SensorServiceImpl implements SensorService {
 
 
     @Override
-    public List<LatestRecordsResponse> getAllLatestHumidityRegisters() {
-        return latestSensorRegisterRepository.findAll().stream().map(
-                LatestRecordsResponse::new
-        ).toList();
+    public List<SensorResponse> getAllSensorsByZone(Long zoneId) {
+        List<Sensor> sensors = sensorRepository.findAllByZone_Id(zoneId);
+
+        List<LatestSensorRegister> latestRegisters = latestSensorRegisterRepository.findBySensorIdIn(
+                sensors.stream().map(Sensor::getSensorId).toList()
+        );
+
+        Map<String, Double> sensorValuesMap = latestRegisters.stream()
+                .collect(Collectors.toMap(LatestSensorRegister::getSensorId, LatestSensorRegister::getValue));
+
+        return sensors.stream().map(sensor -> {
+                    SensorResponse response = new SensorResponse(sensor);
+                    response.setValue(sensorValuesMap.getOrDefault(sensor.getSensorId(), null));
+                    return response;
+                }).toList();
     }
 
     @Override
-    public LatestSensorRegister getLastHumidityRegister(String sensorId) {
-        return null;
+    public Boolean deleteSensor(String sensorId) {
+        try {
+            sensorRepository.deleteById(sensorId);
+            return true;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
     }
 
 

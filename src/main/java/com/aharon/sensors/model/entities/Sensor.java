@@ -1,4 +1,4 @@
-package com.aharon.models.entities;
+package com.aharon.sensors.model.entities;
 
 import com.aharon.models.valueobjets.SensorType;
 import com.aharon.sensors.dto.CreateSensor;

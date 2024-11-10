@@ -1,4 +1,4 @@
-package com.aharon.models.entities;
+package com.aharon.sensors.model.entities;
 
 import com.aharon.sprinklers.dto.CreateSprinkler;
 import com.aharon.zones.model.entities.Zone;

@@ -1,6 +1,6 @@
 package com.aharon.sensors.dto;
 
-import com.aharon.models.entities.Sensor;
+import com.aharon.sensors.model.entities.Sensor;
 import lombok.Data;
 
 import java.util.Date;
@@ -12,7 +12,7 @@ public class SensorResponse {
     private String type;
     private Date lastConnection;
     private Long zoneId;
-    private Float value = null;
+    private Double value = null;
 
     public SensorResponse(Sensor sensor){
         this.sensorId = sensor.getSensorId();

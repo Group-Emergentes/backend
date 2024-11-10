@@ -12,4 +12,5 @@ public interface ZoneService {
     Zone getZoneById(Long id);
     List<ZoneResponse> getZonesByClientId(Long clientId);
 
+
 }

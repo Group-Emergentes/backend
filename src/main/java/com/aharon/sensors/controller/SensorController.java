@@ -30,28 +30,29 @@ public class SensorController {
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
-    @GetMapping("/last-records")
-    public ResponseEntity<ApiResponse<List<LatestRecordsResponse>>> getAllLatestHumidityRegisters() {
-        List<LatestRecordsResponse> latestRegisters = sensorService.getAllLatestHumidityRegisters();
+    @GetMapping("/sensors/{zoneId}")
+    public ResponseEntity<ApiResponse<List<SensorResponse>>> getAllLatestRecords(
+            @PathVariable("zoneId") Long zoneId){
+        List<SensorResponse> sensorResponseList = sensorService.getAllSensorsByZone(zoneId);
 
-        ApiResponse<List<LatestRecordsResponse>> apiResponse = new ApiResponse<>();
+        ApiResponse<List<SensorResponse>> apiResponse = new ApiResponse<>();
         apiResponse.setSuccess(true);
-        apiResponse.setMessage("Latest humidity records fetched successfully.");
-        apiResponse.setData(latestRegisters);
+        apiResponse.setMessage("All sensors for zne "+ zoneId);
+        apiResponse.setData(sensorResponseList);
 
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
-    private ResponseEntity<ApiResponse<Boolean>> getApiResponseResponseEntity(boolean allSuccess, int successCount, int failureCount, StringBuilder messageBuilder) {
-        messageBuilder.insert(0, String.format("Resume: %d successful registrations, %d failed.\n", successCount, failureCount));
+    @DeleteMapping("{sensorId}")
+    public ResponseEntity<ApiResponse<Boolean>> deleteSensor(@PathVariable("sensorId") String sensorId) {
+        sensorService.deleteSensor(sensorId);
 
         ApiResponse<Boolean> apiResponse = new ApiResponse<>();
-        apiResponse.setSuccess(allSuccess);
-        apiResponse.setMessage(messageBuilder.toString());
-        apiResponse.setData(successCount > 0);
+        apiResponse.setSuccess(true);
+        apiResponse.setMessage("Deleted sensor "+sensorId);
+        apiResponse.setData(true);
 
-        HttpStatus status = allSuccess ? HttpStatus.CREATED : (successCount > 0 ? HttpStatus.MULTI_STATUS : HttpStatus.INTERNAL_SERVER_ERROR);
-
-        return new ResponseEntity<>(apiResponse, status);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
+
 }

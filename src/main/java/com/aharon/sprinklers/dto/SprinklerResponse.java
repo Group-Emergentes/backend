@@ -1,5 +1,5 @@
 package com.aharon.sprinklers.dto;
-import com.aharon.models.entities.Sprinkler;
+import com.aharon.sensors.model.entities.Sprinkler;
 import lombok.Data;
 
 import java.util.Date;

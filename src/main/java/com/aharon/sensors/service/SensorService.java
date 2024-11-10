@@ -1,7 +1,5 @@
 package com.aharon.sensors.service;
 
-import com.aharon.models.entities.LatestSensorRegister;
-import com.aharon.models.entities.Sensor;
 import com.aharon.sensors.dto.*;
 
 import java.util.List;
@@ -11,13 +9,10 @@ public interface SensorService {
 
     SensorResponse addSensor(CreateSensor createSensor);
 
-    Sensor getBySensorId(String sensorId);
-
     void addSensorRecord(SensorRecordRequest sensorRecordRequest);
 
-    List<LatestRecordsResponse> getAllLatestHumidityRegisters();
+    List<SensorResponse> getAllSensorsByZone(Long zoneId);
 
-    LatestSensorRegister getLastHumidityRegister(String sensorId);
-
+    Boolean deleteSensor(String sensorId);
 
 }
