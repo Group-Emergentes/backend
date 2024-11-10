@@ -30,66 +30,6 @@ public class SensorController {
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
-    @PostMapping("add-temperature-register")
-    public ResponseEntity<ApiResponse<Boolean>> addRegister(
-            @Valid @RequestBody List<SensorRecordRequest> temperatureRegisterList){
-
-        boolean allSuccess = true;
-        int successCount = 0;
-        int failureCount = 0;
-        StringBuilder messageBuilder = new StringBuilder();
-
-        for (SensorRecordRequest sensorRecordRequest : temperatureRegisterList) {
-            try {
-                sensorService.addSensorRecord(sensorRecordRequest);
-                successCount++;
-                messageBuilder.append("Record successfully added for the sensor: ")
-                        .append(sensorRecordRequest.getSensorId())
-                        .append("\n");
-            } catch (Exception e) {
-                allSuccess = false;
-                failureCount++;
-                messageBuilder.append("Error adding record for sensor: ")
-                        .append(sensorRecordRequest.getSensorId())
-                        .append(" - Error: ")
-                        .append(e.getMessage())
-                        .append("\n");
-            }
-        }
-
-        return getApiResponseResponseEntity(allSuccess, successCount, failureCount, messageBuilder);
-    }
-
-    @PostMapping("add-humidity-register")
-    public ResponseEntity<ApiResponse<Boolean>> addHumidityRegister(
-            @Valid @RequestBody List<SensorRecordRequest> humidityRegisterList){
-
-        boolean allSuccess = true;
-        int successCount = 0;
-        int failureCount = 0;
-        StringBuilder messageBuilder = new StringBuilder();
-
-        for(SensorRecordRequest sensorRecordRequest: humidityRegisterList){
-            try{
-                sensorService.addSensorRecord(sensorRecordRequest);
-                successCount++;
-                messageBuilder.append("Record successfully added for sensor: ")
-                        .append(sensorRecordRequest.getSensorId())
-                        .append("\n");
-            }catch(Exception e){
-                allSuccess = false;
-                failureCount ++;
-                messageBuilder.append("Error adding record for sensor: ")
-                        .append(sensorRecordRequest.getSensorId())
-                        .append(" - Error: ")
-                        .append(e.getMessage())
-                        .append("\n");
-            }
-        }
-
-        return getApiResponseResponseEntity(allSuccess, successCount, failureCount, messageBuilder);
-    }
-
     @GetMapping("/last-records")
     public ResponseEntity<ApiResponse<List<LatestRecordsResponse>>> getAllLatestHumidityRegisters() {
         List<LatestRecordsResponse> latestRegisters = sensorService.getAllLatestHumidityRegisters();
@@ -101,13 +41,6 @@ public class SensorController {
 
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
-
-
-
-
-
-
-
 
     private ResponseEntity<ApiResponse<Boolean>> getApiResponseResponseEntity(boolean allSuccess, int successCount, int failureCount, StringBuilder messageBuilder) {
         messageBuilder.insert(0, String.format("Resume: %d successful registrations, %d failed.\n", successCount, failureCount));
