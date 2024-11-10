@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/zones")
 @AllArgsConstructor
@@ -40,6 +42,18 @@ public class ZoneController {
         apiResponse.setSuccess(true);
         apiResponse.setMessage("Analysis Completed");
         apiResponse.setData(temperatureMonitoring);
+
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("client/{clientId}")
+    public ResponseEntity<ApiResponse<List<ZoneResponse>>> getZone(@PathVariable Long clientId){
+        List<ZoneResponse> zoneList= zoneService.getZonesByClientId(clientId);
+
+        ApiResponse<List<ZoneResponse>> apiResponse = new ApiResponse<>();
+        apiResponse.setSuccess(true);
+        apiResponse.setMessage("All zones of client "+ clientId +" are available");
+        apiResponse.setData(zoneList);
 
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }

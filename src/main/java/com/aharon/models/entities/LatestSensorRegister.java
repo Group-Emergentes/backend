@@ -1,5 +1,6 @@
 package com.aharon.models.entities;
 
+import com.aharon.zones.model.entities.Zone;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;

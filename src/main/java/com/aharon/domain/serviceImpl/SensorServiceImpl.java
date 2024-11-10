@@ -4,7 +4,7 @@ import com.aharon.models.entities.HumidityHistory;
 import com.aharon.models.entities.LatestSensorRegister;
 import com.aharon.models.entities.Sensor;
 import com.aharon.models.entities.TemperatureHistory;
-import com.aharon.models.entities.Zone;
+import com.aharon.zones.model.entities.Zone;
 import com.aharon.models.valueobjets.SensorType;
 import com.aharon.sensors.dto.*;
 import com.aharon.sensors.repository.HumidityHistoryRepository;

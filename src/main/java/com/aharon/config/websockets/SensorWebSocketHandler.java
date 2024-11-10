@@ -1,7 +1,7 @@
 package com.aharon.config.websockets;
 
 import com.aharon.models.entities.Notification;
-import com.aharon.models.entities.Zone;
+import com.aharon.zones.model.entities.Zone;
 import com.aharon.notifications.service.NotificationService;
 import com.aharon.sensors.dto.SensorRecordRequest;
 import com.aharon.sensors.service.SensorService;

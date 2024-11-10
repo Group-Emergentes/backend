@@ -1,9 +1,7 @@
 package com.aharon.domain.serviceImpl;
 
-import com.aharon.models.entities.Sensor;
 import com.aharon.models.entities.Sprinkler;
-import com.aharon.models.entities.Zone;
-import com.aharon.sensors.dto.SensorResponse;
+import com.aharon.zones.model.entities.Zone;
 import com.aharon.sprinklers.dto.CreateSprinkler;
 import com.aharon.sprinklers.dto.SprinklerResponse;
 import com.aharon.sprinklers.repository.SprinklerRepository;

@@ -22,5 +22,7 @@ public class CreateZone {
     private Float minimumHumidity;
     @NotNull
     private Float maximumHumidity;
+    @NotNull
+    private Long clientId;
 
 }

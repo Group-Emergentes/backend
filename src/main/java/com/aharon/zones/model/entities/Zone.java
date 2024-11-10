@@ -1,5 +1,8 @@
-package com.aharon.models.entities;
+package com.aharon.zones.model.entities;
 
+import com.aharon.models.entities.Client;
+import com.aharon.models.entities.Sensor;
+import com.aharon.models.entities.Sprinkler;
 import com.aharon.zones.dto.CreateZone;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -50,7 +53,11 @@ public class Zone {
     @OneToMany(mappedBy = "zone", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sprinkler> sprinklerList = null;
 
-    public Zone(CreateZone createZone) {
+    @ManyToOne
+    @JoinColumn(name = "client_id", nullable = false)
+    private Client client;
+
+    public Zone(CreateZone createZone, Client client) {
         this.name = createZone.getName();
         this.cropType = createZone.getCropType();
         this.width = createZone.getWidth();
@@ -59,5 +66,6 @@ public class Zone {
         this.maximumTemperature = createZone.getMaximumTemperature();
         this.minimumHumidity = createZone.getMinimumHumidity();
         this.maximumHumidity = createZone.getMaximumHumidity();
+        this.client = client;
     }
 }

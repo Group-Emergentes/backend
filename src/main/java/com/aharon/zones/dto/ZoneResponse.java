@@ -1,6 +1,6 @@
 package com.aharon.zones.dto;
 
-import com.aharon.models.entities.Zone;
+import com.aharon.zones.model.entities.Zone;
 import lombok.Data;
 
 @Data

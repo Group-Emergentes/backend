@@ -1,6 +1,5 @@
 package com.aharon.zones.dto;
 
-import com.aharon.zones.model.GraphData;
 import lombok.Builder;
 import lombok.Data;
 

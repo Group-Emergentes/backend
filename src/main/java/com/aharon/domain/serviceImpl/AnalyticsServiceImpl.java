@@ -2,7 +2,7 @@ package com.aharon.domain.serviceImpl;
 
 import com.aharon.models.entities.TemperatureHistory;
 import com.aharon.sensors.repository.TemperatureRegisterRepository;
-import com.aharon.zones.model.GraphData;
+import com.aharon.zones.dto.GraphData;
 import com.aharon.zones.dto.TemperatureMonitoring;
 import com.aharon.zones.service.AnalyticsService;
 import lombok.AllArgsConstructor;

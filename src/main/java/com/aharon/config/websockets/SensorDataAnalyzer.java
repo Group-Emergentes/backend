@@ -1,6 +1,6 @@
 package com.aharon.config.websockets;
 
-import com.aharon.models.entities.Zone;
+import com.aharon.zones.model.entities.Zone;
 import com.aharon.sensors.dto.SensorRecordRequest;
 
 import java.util.List;

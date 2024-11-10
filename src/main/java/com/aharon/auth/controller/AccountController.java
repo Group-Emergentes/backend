@@ -4,8 +4,6 @@ import com.aharon.auth.dto.AuthResponse;
 import com.aharon.auth.dto.LoginRequest;
 import com.aharon.auth.service.AccountService;
 import com.aharon.clients.dto.ClientRequest;
-import com.aharon.clients.dto.ClientResponse;
-import com.aharon.clients.service.ClientService;
 import com.aharon.common.dto.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -38,7 +36,7 @@ public class AccountController {
     @PostMapping("login")
     public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
 
-        AuthResponse authResponse = accountService.login(request.getUsername(), request.getPassword());
+        AuthResponse authResponse = accountService.login(request.getEmail(), request.getPassword());
 
         ApiResponse<AuthResponse> apiResponse = new ApiResponse<>();
         apiResponse.setSuccess(true);

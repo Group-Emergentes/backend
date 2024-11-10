@@ -1,4 +1,4 @@
-package com.aharon.zones.model;
+package com.aharon.zones.dto;
 
 import lombok.Builder;
 import lombok.Data;

@@ -2,6 +2,7 @@ package com.aharon.models.entities;
 
 import com.aharon.models.valueobjets.SensorType;
 import com.aharon.sensors.dto.CreateSensor;
+import com.aharon.zones.model.entities.Zone;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

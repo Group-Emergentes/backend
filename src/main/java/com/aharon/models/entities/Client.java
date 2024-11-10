@@ -2,11 +2,14 @@ package com.aharon.models.entities;
 
 import com.aharon.auth.model.Account;
 import com.aharon.clients.dto.ClientRequest;
+import com.aharon.zones.model.entities.Zone;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,6 +33,9 @@ public class Client {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id", referencedColumnName = "id")
     private Account account;
+
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Zone> zoneList = null;
 
     public Client(ClientRequest clientRequest, Account account) {
         this.name = clientRequest.getName();
