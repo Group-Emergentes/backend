@@ -49,6 +49,9 @@ public class AccountServiceImpl implements AccountService {
         Client client = new Client(clientRequest, account);
         clientRepository.save(client);
 
+        account.setClient(client);
+        accountRepository.save(account);
+
         return AuthResponse.builder()
                 .token("token here")
                 .client(new ClientResponse(account.getClient()))
