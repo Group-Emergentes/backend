@@ -1,6 +1,6 @@
 package com.aharon.sensors.dto;
 
-import com.aharon.models.valueobjets.SensorType;
+import com.aharon.sensors.model.valueobjets.SensorType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 

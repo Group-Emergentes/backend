@@ -1,6 +1,5 @@
-package com.aharon.sensors.model.entities;
+package com.aharon.sprinklers.model;
 
-import com.aharon.sprinklers.dto.CreateSprinkler;
 import com.aharon.zones.model.entities.Zone;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -22,16 +21,24 @@ public class Sprinkler {
     private String sprinklerId;
 
     @NotNull
-    private Boolean active = false;
+    private Boolean active;
 
     private Date lastActivation;
+
+    private Boolean isManualActivated;
+
+    private Boolean isAutomaticActivated;
 
     @ManyToOne
     @JoinColumn(name = "zone_id", nullable = false)
     private Zone zone;
 
-    public Sprinkler(CreateSprinkler createSprinkler) {
-        this.sprinklerId = createSprinkler.getSprinklerId();
+    public Sprinkler(String sprinklerId) {
+        this.sprinklerId = sprinklerId;
+        this.isManualActivated = false;
+        this.isAutomaticActivated= false;
+        this.lastActivation = new Date();
+        this.active = false;
 
     }
 }

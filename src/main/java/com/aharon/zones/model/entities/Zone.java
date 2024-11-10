@@ -2,7 +2,7 @@ package com.aharon.zones.model.entities;
 
 import com.aharon.models.entities.Client;
 import com.aharon.sensors.model.entities.Sensor;
-import com.aharon.sensors.model.entities.Sprinkler;
+import com.aharon.sprinklers.model.Sprinkler;
 import com.aharon.zones.dto.CreateZone;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

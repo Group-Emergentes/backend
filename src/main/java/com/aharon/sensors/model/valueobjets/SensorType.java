@@ -1,4 +1,4 @@
-package com.aharon.models.valueobjets;
+package com.aharon.sensors.model.valueobjets;
 
 public enum SensorType {
     TEMPERATURE,

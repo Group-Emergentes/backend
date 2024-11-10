@@ -1,6 +1,6 @@
 package com.aharon.sensors.model.entities;
 
-import com.aharon.models.valueobjets.SensorType;
+import com.aharon.sensors.model.valueobjets.SensorType;
 import com.aharon.sensors.dto.CreateSensor;
 import com.aharon.zones.model.entities.Zone;
 import jakarta.persistence.*;
