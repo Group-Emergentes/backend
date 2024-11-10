@@ -15,8 +15,8 @@ import java.util.Optional;
 public interface HumidityHistoryRepository extends JpaRepository<HumidityHistory, Long> {
     Optional<HumidityHistory> findFirstByOrderByRegisterDateDesc();
 
-    @Query("SELECT h FROM HumidityHistory h ORDER BY h.registerDate DESC")
-    List<HumidityHistory> findTop30ByOrderByRegisterDateDesc(Pageable pageable);
+    @Query("SELECT h FROM HumidityHistory h WHERE h.zone.id = :zoneId ORDER BY h.registerDate DESC")
+    List<HumidityHistory> findTop30ByZoneIdOrderByRegisterDateDesc(@Param("zoneId") Long zoneId, Pageable pageable);
 
     @Query("SELECT h FROM HumidityHistory h WHERE h.registerDate >= :startDate AND h.registerDate <= :endDate AND h.zone.id = :zoneId")
     List<HumidityHistory> findHumidityRecordsWithinDateRangeAndZone(

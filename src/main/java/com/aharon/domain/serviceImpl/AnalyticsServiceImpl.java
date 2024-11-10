@@ -41,7 +41,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         Double last30DaysAverage = calculateAverageForPeriod(DAYS_IN_30_DAYS, zoneId);
 
         List<HumidityHistory> last30RecordsHumidity =
-                humidityHistoryRepository.findTop30ByOrderByRegisterDateDesc(pageable);
+                humidityHistoryRepository.findTop30ByZoneIdOrderByRegisterDateDesc(zoneId, pageable);
 
         List<GraphData> last30RecordsGraph = last30RecordsHumidity.stream()
                 .map(humidityHistory -> new GraphData(humidityHistory.getRegisterDate(), humidityHistory.getValue()))
