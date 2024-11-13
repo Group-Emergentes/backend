@@ -28,6 +28,7 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
     private final NotificationService notificationService;
     private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
     private SensorDataAnalyzer analyzer;
+    private boolean sprinklersActive = false;
 
     private Zone zone;
 
@@ -84,6 +85,7 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
             response.put("activeSprinklers", analyzer.shouldActivateSprinklers(sensorRecords));
             response.put("optimalHumidity", this.zone.getOptimalHumidity());
             response.put("optimalTemperature", this.zone.getOptimalTemperature());
+            response.put("actualStateSprinklers", this.sprinklersActive);
 
             TextMessage broadcastMessage = new TextMessage(response.toString());
             for (WebSocketSession activeSession : sessions) {
@@ -103,17 +105,7 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    public void notifySprinklerStatusChange(Long zoneId, boolean active) throws IOException {
-        ObjectNode response = objectMapper.createObjectNode();
-        response.put("message", "SprinklersUpdated");
-        response.put("zoneId", zoneId);
-        response.put("activeSprinklers", active);
-
-        TextMessage broadcastMessage = new TextMessage(response.toString());
-        for (WebSocketSession session : sessions) {
-            if (session.isOpen()) {
-                session.sendMessage(broadcastMessage);
-            }
-        }
+    public void changeSprinklerStatus(boolean status){
+        this.sprinklersActive = status;
     }
 }

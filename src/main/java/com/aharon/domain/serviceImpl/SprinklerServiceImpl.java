@@ -89,11 +89,7 @@ public class SprinklerServiceImpl implements SprinklerService {
 
         sprinklerRepository.saveAll(sprinklers);
 
-        try {
-            sensorWebSocketHandler.notifySprinklerStatusChange(sprinklerActionRequest.getZoneId(), true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sensorWebSocketHandler.changeSprinklerStatus(true);
 
         return true;
     }
@@ -134,11 +130,8 @@ public class SprinklerServiceImpl implements SprinklerService {
         }
         sprinklerRepository.saveAll(sprinklers);
 
-        try {
-            sensorWebSocketHandler.notifySprinklerStatusChange(sprinklerActionRequest.getZoneId(), false);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sensorWebSocketHandler.changeSprinklerStatus(false);
+
 
         return true;
     }
