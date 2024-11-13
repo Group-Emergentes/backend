@@ -3,7 +3,7 @@ package com.aharon.config.websockets;
 import com.aharon.models.entities.Notification;
 import com.aharon.zones.model.entities.Zone;
 import com.aharon.notifications.service.NotificationService;
-import com.aharon.sensors.dto.SensorRecordRequest;
+import com.aharon.config.websockets.dto.SensorRecordRequest;
 import com.aharon.sensors.service.SensorService;
 import com.aharon.zones.service.ZoneService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,7 +28,8 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
     private final NotificationService notificationService;
     private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
     private SensorDataAnalyzer analyzer;
-    private long zoneId;
+
+    private Zone zone;
 
     public SensorWebSocketHandler(
             SensorService sensorService,
@@ -46,9 +47,9 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         UriTemplate template = new UriTemplate("/ws/register-sensor-data/{zoneId}");
         Map<String, String> parameters = template.match(session.getUri().getPath());
-        this.zoneId = Long.parseLong(parameters.get("zoneId"));
+        Long zoneId = Long.parseLong(parameters.get("zoneId"));
 
-        Zone zone = zoneService.getZoneById(zoneId);
+        this.zone = zoneService.getZoneById(zoneId);
         this.analyzer = new SensorDataAnalyzer(zone);
 
         sessions.add(session);
@@ -68,7 +69,7 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
 
                 if (analyzer.isReadingOutOfRange(sensorRecord)) {
                     Notification notification = new Notification();
-                    notification.setZoneId(zoneId);
+                    notification.setZoneId(this.zone.getId());
                     notification.setSensorId(sensorRecord.getSensorId());
                     notification.setMessage("ALERT: Sensor " + sensorRecord.getSensorId() + " has an irregular reading. Value: " + sensorRecord.getValue());
                     notification.setTimestamp(new Date());
@@ -81,6 +82,8 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
             response.put("message", "Data processed successfully.");
             response.set("sensorData", objectMapper.valueToTree(sensorRecords));
             response.put("activeSprinklers", analyzer.shouldActivateSprinklers(sensorRecords));
+            response.put("optimalHumidity", this.zone.getOptimalHumidity());
+            response.put("optimalTemperature", this.zone.getOptimalTemperature());
 
             TextMessage broadcastMessage = new TextMessage(response.toString());
             for (WebSocketSession activeSession : sessions) {

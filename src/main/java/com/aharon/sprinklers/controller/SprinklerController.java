@@ -1,7 +1,7 @@
 package com.aharon.sprinklers.controller;
 
 import com.aharon.common.dto.ApiResponse;
-import com.aharon.sprinklers.dto.ActiveRequest;
+import com.aharon.sprinklers.dto.SprinklerActionRequest;
 import com.aharon.sprinklers.dto.CreateSprinkler;
 import com.aharon.sprinklers.dto.SprinklerResponse;
 import com.aharon.sprinklers.service.SprinklerService;
@@ -55,26 +55,20 @@ public class SprinklerController {
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
-    @PostMapping("zone/active-sprinklers")
-    public ResponseEntity<ApiResponse<Boolean>> activeSprinklersByZone(@RequestBody ActiveRequest activeRequest){
-        Boolean active = sprinklerService.activeAllSprinklersByZoneId(activeRequest);
+    @PostMapping("zone/active-disable-sprinklers")
+    public ResponseEntity<ApiResponse<Boolean>> changeSprinklersByZoneId(@RequestBody SprinklerActionRequest sprinklerActionRequest){
+        Boolean change = false;
+        if(sprinklerActionRequest.getActive()){
+            change = sprinklerService.activeAllSprinklersByZoneId(sprinklerActionRequest);
+        }else{
+            change = sprinklerService.disableAllSprinklersByZoneId(sprinklerActionRequest);
+        }
+
 
         ApiResponse<Boolean> apiResponse = new ApiResponse<>();
         apiResponse.setSuccess(true);
-        apiResponse.setMessage("Sprinklers activated in zone "+ activeRequest.getZoneId());
-        apiResponse.setData(active);
-
-        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
-    }
-
-    @PostMapping("zone/disable-sprinklers/{zoneId}")
-    public ResponseEntity<ApiResponse<Boolean>> disableSprinklersByZone(@PathVariable Long zoneId){
-        Boolean disable = sprinklerService.disableAllSprinklersByZoneId(zoneId);
-
-        ApiResponse<Boolean> apiResponse = new ApiResponse<>();
-        apiResponse.setSuccess(true);
-        apiResponse.setMessage("Sprinklers disable in zone "+ zoneId);
-        apiResponse.setData(disable);
+        apiResponse.setMessage("Sprinklers change in zone "+ sprinklerActionRequest.getZoneId());
+        apiResponse.setData(change);
 
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }

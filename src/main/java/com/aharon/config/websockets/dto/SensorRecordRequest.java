@@ -1,4 +1,4 @@
-package com.aharon.sensors.dto;
+package com.aharon.config.websockets.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

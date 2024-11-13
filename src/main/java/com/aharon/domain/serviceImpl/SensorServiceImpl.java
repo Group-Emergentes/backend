@@ -1,5 +1,6 @@
 package com.aharon.domain.serviceImpl;
 
+import com.aharon.config.websockets.dto.SensorRecordRequest;
 import com.aharon.models.entities.HumidityHistory;
 import com.aharon.models.entities.LatestSensorRegister;
 import com.aharon.sensors.model.entities.Sensor;

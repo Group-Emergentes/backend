@@ -59,7 +59,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 .build();
     }
 
-
     private Double calculateAverageForPeriod(int days, Long zoneId ) {
         Date endDate = new Date();
         Date startDate = getDateDaysAgo(days);
@@ -72,8 +71,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 .average()
                 .orElse(0.0);
     }
-
-
 
     private List<GraphData> getLast30Days(Long zoneId) {
         Date endDate = new Date();

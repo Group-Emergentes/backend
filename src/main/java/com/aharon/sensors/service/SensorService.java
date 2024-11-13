@@ -1,5 +1,6 @@
 package com.aharon.sensors.service;
 
+import com.aharon.config.websockets.dto.SensorRecordRequest;
 import com.aharon.sensors.dto.*;
 
 import java.util.List;

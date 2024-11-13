@@ -1,6 +1,6 @@
 package com.aharon.domain.serviceImpl;
 
-import com.aharon.sprinklers.dto.ActiveRequest;
+import com.aharon.sprinklers.dto.SprinklerActionRequest;
 import com.aharon.sprinklers.model.Sprinkler;
 import com.aharon.sprinklers.model.SprinklerActivationHistory;
 import com.aharon.sprinklers.model.valueobjets.ActivationType;
@@ -64,44 +64,61 @@ public class SprinklerServiceImpl implements SprinklerService {
 
     @Override
     @Transactional
-    public Boolean activeAllSprinklersByZoneId(ActiveRequest activeRequest) {
-        List<Sprinkler> sprinklers = sprinklerRepository.findAllByZone_Id(activeRequest.getZoneId());
+    public Boolean activeAllSprinklersByZoneId(SprinklerActionRequest sprinklerActionRequest) {
+        List<Sprinkler> sprinklers = sprinklerRepository.findAllByZone_Id(sprinklerActionRequest.getZoneId());
+        boolean allActive = true;
 
         Date activationDate = new Date();
 
-        for(Sprinkler sprinkler: sprinklers){
-            if(sprinkler.getActive()) continue;
+        for (Sprinkler sprinkler : sprinklers) {
+            if (sprinkler.getActive()) continue;
 
+            allActive = false;
             sprinkler.setActive(true);
             sprinkler.setLastActivation(activationDate);
 
-            sprinkler.setIsManualActivated(activeRequest.getIsManual());
-            sprinkler.setIsAutomaticActivated(!activeRequest.getIsManual());
+            sprinkler.setIsManualActivated(sprinklerActionRequest.getIsManual());
+            sprinkler.setIsAutomaticActivated(!sprinklerActionRequest.getIsManual());
         }
-        sprinklerRepository.saveAll(sprinklers);
 
+        if (allActive) return false;
+
+        sprinklerRepository.saveAll(sprinklers);
         return true;
     }
 
     @Override
     @Transactional
-    public Boolean disableAllSprinklersByZoneId(Long zoneId) {
-        List<Sprinkler> sprinklers = sprinklerRepository.findAllByZone_Id(zoneId);
+    public Boolean disableAllSprinklersByZoneId(SprinklerActionRequest sprinklerActionRequest) {
+        List<Sprinkler> sprinklers = sprinklerRepository.findAllByZone_Id(sprinklerActionRequest.getZoneId());
+        if (sprinklers.isEmpty()) return false;
+
+        boolean isManual = sprinklerActionRequest.getIsManual();
+        Date nowDate = new Date();
+
+        if (!isManual && nowDate.getTime() - sprinklers.get(0).getLastActivation().getTime()  < 180000) {
+            return false;
+        }
+
         List<SprinklerActivationHistory> activationHistoryList = new ArrayList<>();
+        boolean anyActive = false;
 
-        for(Sprinkler sprinkler: sprinklers){
-            if(!sprinkler.getActive()) continue;
+        ActivationType activationType;
 
-            ActivationType activationType = sprinkler.getIsAutomaticActivated()
-                    ? ActivationType.AUTOMATIC
-                    : ActivationType.MANUAL;
+        for (Sprinkler sprinkler : sprinklers) {
+            if (!sprinkler.getActive()) continue;
 
+            activationType = sprinkler.getIsAutomaticActivated() ? ActivationType.AUTOMATIC : ActivationType.MANUAL;
             activationHistoryList.add(new SprinklerActivationHistory(sprinkler, activationType));
-            sprinkler.setActive(false);
 
+            sprinkler.setActive(false);
             sprinkler.setIsManualActivated(false);
             sprinkler.setIsAutomaticActivated(false);
+            anyActive = true;
         }
+
+        if (!anyActive) return false;
+
         if (!activationHistoryList.isEmpty()) {
             sprinklerActivationHistoryRepository.saveAll(activationHistoryList);
         }
@@ -109,4 +126,6 @@ public class SprinklerServiceImpl implements SprinklerService {
 
         return true;
     }
+
 }
+

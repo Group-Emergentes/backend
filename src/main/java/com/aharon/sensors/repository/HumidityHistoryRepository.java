@@ -9,11 +9,9 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface HumidityHistoryRepository extends JpaRepository<HumidityHistory, Long> {
-    Optional<HumidityHistory> findFirstByOrderByRegisterDateDesc();
 
     @Query("SELECT h FROM HumidityHistory h WHERE h.zone.id = :zoneId ORDER BY h.registerDate DESC")
     List<HumidityHistory> findTop30ByZoneIdOrderByRegisterDateDesc(@Param("zoneId") Long zoneId, Pageable pageable);

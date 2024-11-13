@@ -1,6 +1,6 @@
 package com.aharon.sprinklers.service;
 
-import com.aharon.sprinklers.dto.ActiveRequest;
+import com.aharon.sprinklers.dto.SprinklerActionRequest;
 import com.aharon.sprinklers.dto.CreateSprinkler;
 import com.aharon.sprinklers.dto.SprinklerResponse;
 
@@ -14,8 +14,8 @@ public interface SprinklerService {
 
     List<SprinklerResponse> getAllSprinklersByZoneId(Long zoneId);
 
-    Boolean activeAllSprinklersByZoneId(ActiveRequest activeRequest);
+    Boolean activeAllSprinklersByZoneId(SprinklerActionRequest sprinklerActionRequest);
 
-    Boolean disableAllSprinklersByZoneId(Long zoneId);
+    Boolean disableAllSprinklersByZoneId(SprinklerActionRequest sprinklerActionRequest);
 
 }

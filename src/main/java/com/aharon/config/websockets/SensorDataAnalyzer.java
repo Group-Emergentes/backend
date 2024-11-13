@@ -1,19 +1,20 @@
 package com.aharon.config.websockets;
 
 import com.aharon.zones.model.entities.Zone;
-import com.aharon.sensors.dto.SensorRecordRequest;
+import com.aharon.config.websockets.dto.SensorRecordRequest;
 
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
 
 public class SensorDataAnalyzer {
 
-    private Zone zone;
+    private final Zone zone;
     public SensorDataAnalyzer(Zone zone) {
         this.zone = zone;
     }
 
     public boolean isReadingOutOfRange(SensorRecordRequest sensorRecord) {
-        if (sensorRecord.getSensorId().equals("sensor-0001")) {
+        if (sensorRecord.getSensorId().equals("Tsensor-0001")) {
             return sensorRecord.getValue() < zone.getMinimumTemperature() ||
                     sensorRecord.getValue() > zone.getMaximumTemperature();
         }else{
@@ -23,13 +24,14 @@ public class SensorDataAnalyzer {
     }
 
     public double calculateAverage(List<SensorRecordRequest> sensorRecords) {
-
-        double total = sensorRecords.stream()
+        DoubleSummaryStatistics stats = sensorRecords.stream()
+                .filter(record -> !"Tsensor-0001".equals(record.getSensorId()))
                 .mapToDouble(SensorRecordRequest::getValue)
-                .sum();
+                .summaryStatistics();
 
-        return sensorRecords.isEmpty() ? 0.0 : total / sensorRecords.size();
+        return stats.getCount() == 0 ? 0.0 : stats.getAverage();
     }
+
 
     public boolean shouldActivateSprinklers(List<SensorRecordRequest> sensorRecords) {
         double average = calculateAverage(sensorRecords);

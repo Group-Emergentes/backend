@@ -3,6 +3,7 @@ package com.aharon.zones.model.entities;
 import com.aharon.models.entities.Client;
 import com.aharon.sensors.model.entities.Sensor;
 import com.aharon.sprinklers.model.Sprinkler;
+import com.aharon.sprinklers.model.valueobjets.ActivationType;
 import com.aharon.zones.dto.CreateZone;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -57,7 +58,7 @@ public class Zone {
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
-    public Zone(CreateZone createZone, Client client) {
+    ActivationType activationType Zone(CreateZone createZone, Client client) {
         this.name = createZone.getName();
         this.cropType = createZone.getCropType();
         this.width = createZone.getWidth();
@@ -67,5 +68,12 @@ public class Zone {
         this.minimumHumidity = createZone.getMinimumHumidity();
         this.maximumHumidity = createZone.getMaximumHumidity();
         this.client = client;
+    }
+
+    public Double getOptimalHumidity(){
+        return (this.minimumHumidity + this.maximumHumidity)/2.0;
+    }
+    public Double getOptimalTemperature(){
+        return (this.minimumTemperature + this.maximumTemperature)/2.0;
     }
 }
