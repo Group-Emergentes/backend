@@ -13,14 +13,14 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.springframework.web.util.UriTemplate;
 
+import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+
 
 public class SensorWebSocketHandler extends TextWebSocketHandler {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final Map<Long, ObjectNode> alertCache = new ConcurrentHashMap<>();
 
     private final SensorService sensorService;
     private final ZoneService zoneService;
@@ -99,6 +99,20 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
                 if (activeSession.isOpen()) {
                     activeSession.sendMessage(errorMessage);
                 }
+            }
+        }
+    }
+
+    public void notifySprinklerStatusChange(Long zoneId, boolean active) throws IOException {
+        ObjectNode response = objectMapper.createObjectNode();
+        response.put("message", "SprinklersUpdated");
+        response.put("zoneId", zoneId);
+        response.put("activeSprinklers", active);
+
+        TextMessage broadcastMessage = new TextMessage(response.toString());
+        for (WebSocketSession session : sessions) {
+            if (session.isOpen()) {
+                session.sendMessage(broadcastMessage);
             }
         }
     }

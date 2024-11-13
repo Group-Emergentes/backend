@@ -1,5 +1,6 @@
 package com.aharon.domain.serviceImpl;
 
+import com.aharon.config.websockets.SensorWebSocketHandler;
 import com.aharon.sprinklers.dto.SprinklerActionRequest;
 import com.aharon.sprinklers.model.Sprinkler;
 import com.aharon.sprinklers.model.SprinklerActivationHistory;
@@ -11,11 +12,14 @@ import com.aharon.sprinklers.dto.SprinklerResponse;
 import com.aharon.sprinklers.repository.SprinklerRepository;
 import com.aharon.sprinklers.service.SprinklerService;
 import com.aharon.zones.repository.ZoneRepository;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +31,8 @@ public class SprinklerServiceImpl implements SprinklerService {
     private final ZoneRepository zoneRepository;
     private final SprinklerRepository sprinklerRepository;
     private final SprinklerActivationHistoryRepository sprinklerActivationHistoryRepository;
+
+    private final SensorWebSocketHandler sensorWebSocketHandler;
 
     @Override
     public SprinklerResponse addSprinkler(CreateSprinkler createSprinkler) {
@@ -67,7 +73,6 @@ public class SprinklerServiceImpl implements SprinklerService {
     public Boolean activeAllSprinklersByZoneId(SprinklerActionRequest sprinklerActionRequest) {
         List<Sprinkler> sprinklers = sprinklerRepository.findAllByZone_Id(sprinklerActionRequest.getZoneId());
         boolean allActive = true;
-
         Date activationDate = new Date();
 
         for (Sprinkler sprinkler : sprinklers) {
@@ -76,7 +81,6 @@ public class SprinklerServiceImpl implements SprinklerService {
             allActive = false;
             sprinkler.setActive(true);
             sprinkler.setLastActivation(activationDate);
-
             sprinkler.setIsManualActivated(sprinklerActionRequest.getIsManual());
             sprinkler.setIsAutomaticActivated(!sprinklerActionRequest.getIsManual());
         }
@@ -84,6 +88,13 @@ public class SprinklerServiceImpl implements SprinklerService {
         if (allActive) return false;
 
         sprinklerRepository.saveAll(sprinklers);
+
+        try {
+            sensorWebSocketHandler.notifySprinklerStatusChange(sprinklerActionRequest.getZoneId(), true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return true;
     }
 
@@ -123,9 +134,14 @@ public class SprinklerServiceImpl implements SprinklerService {
         }
         sprinklerRepository.saveAll(sprinklers);
 
+        try {
+            sensorWebSocketHandler.notifySprinklerStatusChange(sprinklerActionRequest.getZoneId(), false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return true;
     }
-
 
 
 }
