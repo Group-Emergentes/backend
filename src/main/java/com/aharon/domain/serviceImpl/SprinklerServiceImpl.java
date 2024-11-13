@@ -96,19 +96,18 @@ public class SprinklerServiceImpl implements SprinklerService {
         boolean isManual = sprinklerActionRequest.getIsManual();
         Date nowDate = new Date();
 
-        if (!isManual && nowDate.getTime() - sprinklers.get(0).getLastActivation().getTime()  < 180000) {
+        if (!isManual && sprinklers.get(0).getIsManualActivated()
+                && nowDate.getTime() - sprinklers.get(0).getLastActivation().getTime() < 180000) {
             return false;
         }
 
         List<SprinklerActivationHistory> activationHistoryList = new ArrayList<>();
         boolean anyActive = false;
 
-        ActivationType activationType;
-
         for (Sprinkler sprinkler : sprinklers) {
             if (!sprinkler.getActive()) continue;
 
-            activationType = sprinkler.getIsAutomaticActivated() ? ActivationType.AUTOMATIC : ActivationType.MANUAL;
+            ActivationType activationType = sprinkler.getIsAutomaticActivated() ? ActivationType.AUTOMATIC : ActivationType.MANUAL;
             activationHistoryList.add(new SprinklerActivationHistory(sprinkler, activationType));
 
             sprinkler.setActive(false);
@@ -126,6 +125,8 @@ public class SprinklerServiceImpl implements SprinklerService {
 
         return true;
     }
+
+
 
 }
 
