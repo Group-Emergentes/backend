@@ -58,7 +58,7 @@ public class Zone {
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
-    ActivationType activationType Zone(CreateZone createZone, Client client) {
+    public Zone(CreateZone createZone, Client client) {
         this.name = createZone.getName();
         this.cropType = createZone.getCropType();
         this.width = createZone.getWidth();
