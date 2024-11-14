@@ -81,7 +81,12 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
                 }
             }
 
+            response.put("message", "Data processed successfully.");
+            response.set("sensorData", objectMapper.valueToTree(sensorRecords));
+            response.put("actualSprinklersState", this.sprinklersSate);
+
             TextMessage broadcastMessage = new TextMessage(response.toString());
+
             for (WebSocketSession activeSession : sessions) {
                 if (activeSession.isOpen()) {
                     activeSession.sendMessage(broadcastMessage);
