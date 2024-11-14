@@ -28,7 +28,7 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
     private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
     private boolean sprinklersSate = false;
 
-    private Zone zone;
+    private Zone zone = new Zone();
 
     public SensorWebSocketHandler(
             SensorService sensorService,
