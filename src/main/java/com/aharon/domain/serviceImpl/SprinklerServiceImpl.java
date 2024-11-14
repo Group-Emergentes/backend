@@ -1,6 +1,5 @@
 package com.aharon.domain.serviceImpl;
 
-import com.aharon.config.websockets.SensorWebSocketHandler;
 import com.aharon.sprinklers.dto.SprinklerActionRequest;
 import com.aharon.sprinklers.model.Sprinkler;
 import com.aharon.sprinklers.model.SprinklerActivationHistory;
@@ -12,14 +11,11 @@ import com.aharon.sprinklers.dto.SprinklerResponse;
 import com.aharon.sprinklers.repository.SprinklerRepository;
 import com.aharon.sprinklers.service.SprinklerService;
 import com.aharon.zones.repository.ZoneRepository;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,8 +27,6 @@ public class SprinklerServiceImpl implements SprinklerService {
     private final ZoneRepository zoneRepository;
     private final SprinklerRepository sprinklerRepository;
     private final SprinklerActivationHistoryRepository sprinklerActivationHistoryRepository;
-
-    private final SensorWebSocketHandler sensorWebSocketHandler;
 
     @Override
     public SprinklerResponse addSprinkler(CreateSprinkler createSprinkler) {
@@ -89,8 +83,6 @@ public class SprinklerServiceImpl implements SprinklerService {
 
         sprinklerRepository.saveAll(sprinklers);
 
-        sensorWebSocketHandler.changeSprinklerStatus(true);
-
         return true;
     }
 
@@ -129,9 +121,6 @@ public class SprinklerServiceImpl implements SprinklerService {
             sprinklerActivationHistoryRepository.saveAll(activationHistoryList);
         }
         sprinklerRepository.saveAll(sprinklers);
-
-        sensorWebSocketHandler.changeSprinklerStatus(false);
-
 
         return true;
     }

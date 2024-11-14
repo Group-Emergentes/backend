@@ -16,7 +16,6 @@ import org.springframework.web.util.UriTemplate;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-
 public class SensorWebSocketHandler extends TextWebSocketHandler {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -26,7 +25,6 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
     private final AlertWebSocketHandler alertWebSocketHandler;
     private final NotificationService notificationService;
     private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
-    private boolean sprinklersSate = false;
 
     private Zone zone = new Zone();
 
@@ -49,10 +47,6 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
         Long zoneId = Long.parseLong(parameters.get("zoneId"));
 
         this.zone = zoneService.getZoneById(zoneId);
-
-        if(!this.zone.getSprinklerList().isEmpty()){
-            this.sprinklersSate = this.zone.getSprinklerList().get(0).getActive();
-        }
 
         sessions.add(session);
     }
@@ -83,7 +77,6 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
 
             response.put("message", "Data processed successfully.");
             response.set("sensorData", objectMapper.valueToTree(sensorRecords));
-            response.put("actualSprinklersState", this.sprinklersSate);
 
             TextMessage broadcastMessage = new TextMessage(response.toString());
 
@@ -103,11 +96,6 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
             }
         }
     }
-
-    public void changeSprinklerStatus(boolean status){
-        this.sprinklersSate = status;
-    }
-
 
     private boolean isReadingOutOfRange(SensorRecordRequest sensorRecord) {
         if (sensorRecord.getSensorId().equals("Tsensor-0001")) {

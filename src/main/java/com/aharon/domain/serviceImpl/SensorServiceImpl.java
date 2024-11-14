@@ -86,7 +86,6 @@ public class SensorServiceImpl implements SensorService {
         sensorRepository.save(sensor);
     }
 
-
     @Override
     public List<SensorResponse> getAllSensorsByZone(Long zoneId) {
         List<Sensor> sensors = sensorRepository.findAllByZone_Id(zoneId);
