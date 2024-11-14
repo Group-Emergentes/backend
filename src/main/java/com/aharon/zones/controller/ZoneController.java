@@ -34,6 +34,17 @@ public class ZoneController {
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
+    @GetMapping("{zonedId}")
+    public ResponseEntity<ApiResponse<ZoneResponse>> getZoneById(@PathVariable Long zonedId) {
+        ZoneResponse zoneResponse = new ZoneResponse(zoneService.getZoneById(zonedId));
+
+        ApiResponse<ZoneResponse> apiResponse = new ApiResponse<>();
+        apiResponse.setSuccess(true);
+        apiResponse.setMessage("Zone retrieved successfully.");
+        apiResponse.setData(zoneResponse);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+    }
+
     @GetMapping("{zoneId}/soil-moisture-report")
     public ResponseEntity<ApiResponse<SoilMoistureReport>> getTemperatureMonitoring(@PathVariable Long zoneId){
         SoilMoistureReport soilMoistureReport = analyticsService.getSoilMoistureReportByZoneId(zoneId);
