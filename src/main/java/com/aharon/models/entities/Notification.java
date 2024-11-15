@@ -25,6 +25,9 @@ public class Notification {
     private Long zoneId;
 
     @NotNull
+    private Long clientId;
+
+    @NotNull
     private String sensorId;
 
     private String message;

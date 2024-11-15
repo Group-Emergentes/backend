@@ -66,6 +66,7 @@ public class SensorWebSocketHandler extends TextWebSocketHandler {
                 if (isReadingOutOfRange(sensorRecord)) {
                     Notification notification = new Notification();
                     notification.setZoneId(this.zone.getId());
+                    notification.setClientId(this.zone.getClient().getId());
                     notification.setSensorId(sensorRecord.getSensorId());
                     notification.setMessage("ALERT: Sensor " + sensorRecord.getSensorId() + " has an irregular reading. Value: " + sensorRecord.getValue());
                     notification.setTimestamp(new Date());

@@ -5,6 +5,7 @@ import com.aharon.models.entities.Notification;
 import java.util.List;
 
 public interface NotificationService {
-    Notification createNotification(Notification notification);
+    void createNotification(Notification notification);
     List<Notification> getAllNotifications();
+    List<Notification> getTop100ByClientIdOrderByTimestampDesc(Long zoneId);
 }

@@ -70,10 +70,4 @@ public class Zone {
         this.client = client;
     }
 
-    public Double getOptimalHumidity(){
-        return (this.minimumHumidity + this.maximumHumidity)/2.0;
-    }
-    public Double getOptimalTemperature(){
-        return (this.minimumTemperature + this.maximumTemperature)/2.0;
-    }
 }

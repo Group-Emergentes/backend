@@ -34,9 +34,9 @@ public class ZoneController {
         return new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
     }
 
-    @GetMapping("{zonedId}")
-    public ResponseEntity<ApiResponse<ZoneResponse>> getZoneById(@PathVariable Long zonedId) {
-        ZoneResponse zoneResponse = new ZoneResponse(zoneService.getZoneById(zonedId));
+    @GetMapping("{zoneId}")
+    public ResponseEntity<ApiResponse<ZoneResponse>> getZoneById(@PathVariable Long zoneId) {
+        ZoneResponse zoneResponse = new ZoneResponse(zoneService.getZoneById(zoneId));
 
         ApiResponse<ZoneResponse> apiResponse = new ApiResponse<>();
         apiResponse.setSuccess(true);

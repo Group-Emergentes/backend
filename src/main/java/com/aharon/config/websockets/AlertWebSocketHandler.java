@@ -37,13 +37,7 @@ public class AlertWebSocketHandler extends TextWebSocketHandler {
     }
 
     private void sendCurrentAlerts(WebSocketSession session) throws Exception {
-        List<Notification> alerts = notificationService.getAllNotifications();
-        for (Notification alert : alerts) {
-            ObjectNode alertMessage = objectMapper.createObjectNode();
-            alertMessage.put("sensorId", alert.getSensorId());
-            alertMessage.put("message", alert.getMessage());
-            session.sendMessage(new TextMessage(alertMessage.toString()));
-        }
+
     }
 
     public void broadcastAlerts(Notification alert) throws Exception {

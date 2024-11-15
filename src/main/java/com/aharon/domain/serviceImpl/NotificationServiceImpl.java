@@ -14,12 +14,17 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
 
     @Override
-    public Notification createNotification(Notification notification) {
-        return notificationRepository.save(notification);
+    public void createNotification(Notification notification) {
+        notificationRepository.save(notification);
     }
 
     @Override
     public List<Notification> getAllNotifications() {
         return notificationRepository.findAll();
+    }
+
+    @Override
+    public List<Notification> getTop100ByClientIdOrderByTimestampDesc(Long clientId) {
+        return notificationRepository.findTop100ByClientIdOrderByTimestampDesc(clientId);
     }
 }
