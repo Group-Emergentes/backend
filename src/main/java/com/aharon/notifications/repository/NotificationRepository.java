@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-    @Query("SELECT n FROM Notification n WHERE n.clientId = :zoneId ORDER BY n.clientId DESC")
+    @Query("SELECT n FROM Notification n WHERE n.clientId = :clientId ORDER BY n.clientId DESC")
     List<Notification> findTop100ByClientIdOrderByTimestampDesc(@Param("clientId") Long clientId);
 
 }
